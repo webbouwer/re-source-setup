@@ -1,5 +1,5 @@
 <?php
-function resource_register_theme_customizer( $wp_customize ) {
+function re_source_register_theme_customizer( $wp_customize ) {
 
 	$wp_customize->remove_control('display_header_text');
 	// remove default title / site-identity
@@ -10,13 +10,13 @@ function resource_register_theme_customizer( $wp_customize ) {
 	$wp_customize->remove_panel('colors');
 
 }
-add_action( 'customize_register', 'resource_register_theme_customizer' );
+add_action( 'customize_register', 're_source_register_theme_customizer' );
 
 // default sanitize function
-function resource_sanitize_default($obj){
+function re_source_sanitize_default($obj){
     	return $obj;
 }
-function resource_sanitize_array( $values ) {
+function re_source_sanitize_array( $values ) {
     $multi_values = !is_array( $values ) ? explode( ',', $values ) : $values;
     return !empty( $multi_values ) ? array_map( 'sanitize_text_field', $multi_values ) : array();
 }

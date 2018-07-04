@@ -1,5 +1,5 @@
 /*
-Theme Name: resource
+Theme Name: re-source
 Theme URI: http://www.webdesigndenhaag.net/
 Description: WP Theme for project RE-source
 Version: 0.1
@@ -8,6 +8,23 @@ Author: Webbouwer
 Author URI: https://github.com/webbouwer
 License: GPL 3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
-Text Domain: resource
+Text Domain: re_source
 Tags: theme-options, custom-menu, full-width-template, featured-image-header, featured-images
 */
+
+
+/* Temp dev style */
+body
+{
+font-family: "Typewriter", helvetica, serif;
+font-size:13px;
+color:lightgray;
+background-color: black;
+}
+a{
+color:crimson;
+}
+a.active
+{
+color: lawngreen;
+}

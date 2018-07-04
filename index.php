@@ -40,8 +40,7 @@ require_once('functions.php');
     // include wp head
     wp_head();
 
-	$stylesheet = dirname( __file__ ).'/style.css';
-	echo '<link rel="stylesheet" id="wp-startup-theme-style"  href="'.$stylesheet.'" type="text/css" media="all" />';
+	echo '<link rel="stylesheet" id="wp-startup-theme-style"  href="'.get_template_directory_uri().'/style.css" type="text/css" media="all" />';
 ?>
 </head>
 <body <?php body_class(); ?>>
@@ -60,8 +59,8 @@ require_once('functions.php');
 	?>
 
     <?php
-	echo resource_category_menu();
-	echo resource_tag_menu();
+	echo re_source_category_menu();
+	echo re_source_tag_menu();
 	?>
 
     <div class="tagged-posts"></div>

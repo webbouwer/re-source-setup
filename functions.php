@@ -101,6 +101,11 @@ add_action('wp_enqueue_scripts', 'resource_global_js');
  * Global most used functions
  */
 
+function re_source_editor_styles() {
+    add_editor_style( 'style.css' );
+}
+add_action( 'admin_init', 're_source_editor_styles' );
+
 
 // time ago
 function wp_time_ago( $t ) {
@@ -111,6 +116,7 @@ function wp_time_ago( $t ) {
 
 // words in excerpts
 function the_excerpt_length( $words = null, $links = true ) {
+
 		global $_the_excerpt_length_filter;
 		if( isset($words) ) {
 			$_the_excerpt_length_filter = $words;
@@ -124,7 +130,8 @@ function the_excerpt_length( $words = null, $links = true ) {
 		remove_filter( 'excerpt_length', '_the_excerpt_length_filter' );
 		// reset the global
 		$_the_excerpt_length_filter = null;
-	}
+
+}
 
 function _the_excerpt_length_filter( $default ) {
     global $_the_excerpt_length_filter;
