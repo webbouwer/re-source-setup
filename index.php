@@ -48,45 +48,48 @@ require_once('functions.php');
 	<div id="pagecontainer" class="site">
 
         <?php
-
         echo '<div id="site-navigation" class="main-navigation '.$mainbarclass.' '.$mainminisize.'" role="navigation"><nav>';
         if ( has_nav_menu( 'mainmenu' ) ) {
-        wp_nav_menu( array( 'theme_location' => 'mainmenu' ) );
+            wp_nav_menu( array( 'theme_location' => 'mainmenu' ) );
         }else{
-        wp_nav_menu( array( 'theme_location' => 'primary', 'menu_class' => 'nav-menu' ) );
+            wp_nav_menu( array( 'theme_location' => 'primary', 'menu_class' => 'nav-menu' ) );
         }
         echo '<div class="clr"></div></nav></div>';
+        ?>
 
-
+        <?php
         /**
          * Widgets Header
          */
         if( function_exists('is_sidebar_active') && is_sidebar_active('widgets-header') ){
-        echo '<div id="widgets-header">';
-        dynamic_sidebar('widgets-header');
-        echo '<div class="clr"></div></div>';
+            echo '<div id="widgets-header">';
+            dynamic_sidebar('widgets-header');
+            echo '<div class="clr"></div></div>';
         }
         ?>
-        RE-source
+
+        <div id="contentcontainer">
+        </div>
 
         <?php
         /**
          * Widgets Top Sidebar
          */
         if( function_exists('is_sidebar_active') && is_sidebar_active('widgets-top-sidebar') ){
-        echo '<div id="widgets-top-sidebar">';
-        dynamic_sidebar('widgets-top-sidebar');
-        echo '<div class="clr"></div></div>';
+            echo '<div id="widgets-top-sidebar">';
+            dynamic_sidebar('widgets-top-sidebar');
+            echo '<div class="clr"></div></div>';
         }
         ?>
+
         <?php
         /**
          * Widgets Sidebar
          */
         if( function_exists('is_sidebar_active') && is_sidebar_active('sidebar') ){
-        echo '<div id="sidebar">';
-        dynamic_sidebar('sidebar');
-        echo '<div class="clr"></div></div>';
+            echo '<div id="sidebar">';
+            dynamic_sidebar('sidebar');
+            echo '<div class="clr"></div></div>';
         }
         ?>
 

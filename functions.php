@@ -3,8 +3,9 @@
  * Include more functions
  */
 require get_template_directory() . '/customizer.php'; // customizer functions
-
-
+require get_template_directory() . '/posts.php'; // post ajax functions
+require get_template_directory() . '/view.php'; // view functions
+require get_template_directory() . '/control.php'; // control functions
 
 /* unregister widgets (if really not needed)"*/
  function remove_default_widgets() {
@@ -23,9 +24,6 @@ require get_template_directory() . '/customizer.php'; // customizer functions
      unregister_widget('WP_Nav_Menu_Widget');
  }
  add_action('widgets_init', 'remove_default_widgets', 11);
-
-
-
 
 /*
  * Register widgets
@@ -75,11 +73,10 @@ add_action( 'widgets_init', 'basic_setup_widgets_init' );
 /**
  * Global most used functions
  */
-
-function re_source_editor_styles() {
+function theme_editor_styles() {
     add_editor_style( 'style.css' );
 }
-add_action( 'admin_init', 're_source_editor_styles' );
+add_action( 'admin_init', 'theme_editor_styles' );
 
 // check active widgets
 function is_sidebar_active( $sidebar_id ){
