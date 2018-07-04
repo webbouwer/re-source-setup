@@ -18,11 +18,11 @@ body
 {
 font-family: "Typewriter", helvetica, serif;
 font-size:13px;
-color:lightgray;
+color: lightgray;
 background-color: black;
 }
 a{
-color:crimson;
+color: mediumpurple;
 }
 a.active
 {

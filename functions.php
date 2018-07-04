@@ -3,7 +3,7 @@
  * Include more functions
  */
 require get_template_directory() . '/customizer.php'; // customizer functions
-require get_template_directory() . '/ajax.php'; // ajax functions
+
 
 
 /* unregister widgets (if really not needed)"*/
@@ -72,31 +72,6 @@ function basic_setup_widgets_init() {
 }
 add_action( 'widgets_init', 'basic_setup_widgets_init' );
 
-
-/**
- * customizer variables
- */
-$wp_theme_options = json_encode( get_theme_mods() );
-
-/*
- * Javascript with customizer variables
- */
-// http://wordpress.stackexchange.com/questions/57386/how-do-i-force-wp-enqueue-scripts-to-load-at-the-end-of-head
-function resource_global_js() {
-    // Register the script first.
-    wp_register_script( 'custom_global_js', get_template_directory_uri().'/assets/global.js', 99, '1.0', false);
-    // Get the global data list.
-    global $wp_theme_options;
-	// Localize the global data list for the script
-	wp_localize_script( 'custom_global_js', 'theme_options', $wp_theme_options );
-    // The script can be enqueued now or later.
-    wp_enqueue_script( 'custom_global_js');
-}
-add_action('wp_enqueue_scripts', 'resource_global_js');
-
-
-
-
 /**
  * Global most used functions
  */
@@ -105,83 +80,6 @@ function re_source_editor_styles() {
     add_editor_style( 'style.css' );
 }
 add_action( 'admin_init', 're_source_editor_styles' );
-
-
-// time ago
-function wp_time_ago( $t ) {
-    // https://codex.wordpress.org/Function_Reference/human_time_diff
-    //get_the_time( 'U' )
-    printf( _x( '%s '.__('geleden','wp-startup'), '%s = human-readable time difference', 'imagazine' ), human_time_diff( $t, current_time( 'timestamp' ) ) );
-}
-
-// words in excerpts
-function the_excerpt_length( $words = null, $links = true ) {
-
-		global $_the_excerpt_length_filter;
-		if( isset($words) ) {
-			$_the_excerpt_length_filter = $words;
-		}
-		add_filter( 'excerpt_length', '_the_excerpt_length_filter' );
-		if( $links == false){
-			echo preg_replace('/(?i)<a([^>]+)>(.+?)<\/a>/','', get_the_excerpt() );
-		}else{
-			the_excerpt();
-		}
-		remove_filter( 'excerpt_length', '_the_excerpt_length_filter' );
-		// reset the global
-		$_the_excerpt_length_filter = null;
-
-}
-
-function _the_excerpt_length_filter( $default ) {
-    global $_the_excerpt_length_filter;
-    if( isset($_the_excerpt_length_filter) ) {
-        return $_the_excerpt_length_filter;
-    }
-    return $default;
-}
-
-
-// image orient
-function check_image_orientation($pid){
-	$orient = 'square';
-    $image = wp_get_attachment_image_src( get_post_thumbnail_id($pid), '');
-    $image_w = $image[1];
-    $image_h = $image[2];
-			if ($image_w > $image_h) {
-				$orient = 'landscape';
-			}elseif ($image_w == $image_h) {
-				$orient = 'square';
-			}else {
-				$orient = 'portrait';
-			}
-			return $orient;
-}
-
-// get categories
-function get_categories_select(){
-    $get_cats = get_categories();
-    $results;
-    $count = count($get_cats);
-			for ($i=0; $i < $count; $i++) {
-				if (isset($get_cats[$i]))
-					$results[$get_cats[$i]->slug] = $get_cats[$i]->name;
-				else
-					$count++;
-			}
-    return $results;
-}
-// Category metabox Hierarchy
-function onepiece_wp_terms_checklist_args( $args, $post_id ) {
-
-   $args[ 'checked_ontop' ] = false;
-
-   return $args;
-
-}
-add_filter( 'wp_terms_checklist_args', 'onepiece_wp_terms_checklist_args', 1, 2 );
-
-
 
 // check active widgets
 function is_sidebar_active( $sidebar_id ){
@@ -258,5 +156,4 @@ function bp_remove_signup_gravatar ($image) {
 	}
 }
 add_filter('bp_get_signup_avatar', 'bp_remove_signup_gravatar', 1, 1 );
-
 ?>
