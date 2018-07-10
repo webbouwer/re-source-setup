@@ -190,12 +190,25 @@ jQuery(function($) {
                     type: 'POST', // POST
                     beforeSend:function(xhr){
                     },
-                    success:function(data){
+                    success:function(result){
                         // Display posts on page
-                        $container.html( JSON.stringify(data) );
+                        var html = markupFilterData(result);
+                        $container.html( html );
                         //$container.html( '['+data+']' );
                     }
                 });
+            }
+
+            function markupFilterData(data){
+
+                var html = '';
+                $.each( data, function(idx,obj){
+                        html += obj.title;
+                });
+
+                return html;
+
+                //return JSON.stringify(data);
             }
 
 

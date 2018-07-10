@@ -60,7 +60,8 @@ class WPData{
         $query = new WP_Query( $args );
         $response = array();
         if ( $query->have_posts() ) : while ( $query->have_posts() ) : $query->the_post();
-            $response[get_the_ID()] = array(
+            $response[] = array(
+                'id' => get_the_ID(),
                 'link' => get_the_permalink(),
                 'title' => get_the_title(),
                 'excerpt' => get_the_excerpt() ,
@@ -82,6 +83,7 @@ class WPData{
         wp_die();
 
     }
+
 }
 
 
