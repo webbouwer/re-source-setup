@@ -7,7 +7,6 @@ class WPData{
     /** @obj WPstartupData */
     public $data = [];
 
-
     public function WPData() {
 
         // load settings
@@ -22,12 +21,16 @@ class WPData{
 
         //$ajaxurl .= admin_url( 'admin-ajax.php?lang=' . ICL_LANGUAGE_CODE );
         // Enqueue script
+        global $wp_query;
         wp_register_script('filter_script', get_template_directory_uri().'/js/data.js', false, null, false);
         wp_enqueue_script('filter_script');
         wp_localize_script( 'filter_script', 'filter_vars', array(
             'filter_nonce' => wp_create_nonce( 'filter_nonce' ), // Create nonce
             'filter_ajax_url' => admin_url( 'admin-ajax.php' ),
-            'filter_noposts'  => esc_html__('No older posts found', 're_source')
+            'filter_noposts'  => esc_html__('No older posts found', 're_source'),
+            'posts' => json_encode( $wp_query->query_vars ), // everything about your loop is here
+		    'current_page' => get_query_var( 'paged' ) ? get_query_var('paged') : 1,
+		    'max_page' => $wp_query->max_num_pages
             )
         );
     }
@@ -43,33 +46,52 @@ class WPData{
 
         // id? -> get single post
 
-        // cats? -> if array -> cats to cvs
-
         // tags? -> if array -> tags to cvs
+
+        // cats? -> if array -> cats to cvs
+        $tags = $wpdata['filter_data']['tags'];
+        $cats = $wpdata['filter_data']['cats'];
+
         $args = array(
-            'tag' => $wpdata['filter_data']['tags'],
-            'post_type' => 'post',
-            'posts_per_page' => 10,
+            'tag' => $tags,
+            //'category_name' => $cats,
+            'post_type' => 'post', // 'any',  = incl pages
+            'post_status' => 'publish',
+            //'post__not_in' => $wpdata['filter_data']['notids'],
+            //'posts_offset' => count($wpdata['filter_data']['notids']),
+            //'posts_per_page' =>  $wpdata['filter_data']['ppp'],
+            //'order'          => 'DESC',      // 'DESC', 'ASC' or 'RAND'
+            //'orderby'        => 'date',
         );
-        if( !$wpdata['filter_data']['tags'] ) {
+
+        if( !$wpdata['filter_data']['tags'] || $wpdata['filter_data']['tags'] == '') {
             unset( $args['tag'] );
+        }if( !$wpdata['filter_data']['cats'] || $wpdata['filter_data']['cats'] == '') {
+            unset( $args['cats'] );
+        }
+        if( !$wpdata['filter_data']['notids']  || $wpdata['filter_data']['notids'] == '') {
+            unset( $args['post__not_in'] );
         }
 
 
         // prepare response $response = $wpdata['filter_data']['tags'];
         $query = new WP_Query( $args );
         $response = array();
-        if ( $query->have_posts() ) : while ( $query->have_posts() ) : $query->the_post();
+        $count = array();
+        if ( $query->have_posts() ) :
+
+        while ( $query->have_posts() ) : $query->the_post();
             $response[] = array(
                 'id' => get_the_ID(),
                 'link' => get_the_permalink(),
                 'title' => get_the_title(),
                 'excerpt' => get_the_excerpt() ,
                 'content' => apply_filters('the_content', get_the_content() ),
-                'tags' => get_the_tags(),
+                'cats' => wp_get_post_terms( get_the_ID(), 'category', array("fields" => "slugs")),
+                'tags' => wp_get_post_terms( get_the_ID(), 'post_tag', array("fields" => "slugs")),
                 'date' => get_the_date(),
-                'author' => get_the_author()
-
+                'author' => get_the_author(),
+                'custom_field_keys' => get_post_custom_keys()
             );
         endwhile;
         else:

@@ -22,14 +22,18 @@ jQuery(function($) {
             var $container = $('#itemcontainer'),
             $colWidth = $container.width()/7,
             $currCat = '',
+            loadedids = [],
             allTags = [],
             basefilter = [],
             filter = basefilter,
+            prevfilter = '',
             filterClass = '*';//['tag2','tag3'];
 
             $('#tagfilterbox .tag-filter').each( function( index ){
                     allTags[index] = $(this).data('slug');
             });
+
+
 
             if(window.location.hash) {
                 var hashvars = getHashUrlVars();
@@ -110,6 +114,31 @@ jQuery(function($) {
                 $('#tagfilterbox .'+ $(this).data('slug') ).trigger('click');
             });
 
+            $('body').on( 'click', '.loadmore', function(event){
+                if (event.preventDefault) {
+                    event.preventDefault();
+                } else {
+                    event.returnValue = false;
+                }
+
+                filter = [];
+                $('#tagfilterbox .tag-filter.selected').each( function( index ){
+                    filter[index] = $(this).data('slug');
+                });
+                prevfilter = filter;
+
+                activeFilterMenu( filter );
+                loadFilterData( filter );
+                setNewHash( filter.join() );
+
+                filterClass = '*';
+                if( filter.length > 0 ){
+                    filterClass = '.'+filter.join(',.');
+                }
+            });
+
+
+
 
             // add weight to tag relation
             function newTagWeight( obj, filter ){
@@ -175,9 +204,22 @@ jQuery(function($) {
 
             function loadFilterData( filter ){
 
-                    // not id's $container.find('item').each(function(){  });
-                    var notids = []
-                    var filter_data = { 'tags' : filter.join(), 'notids' : notids.join() };
+                    var loadedids = [];
+                    if( prevfilter == filter ){ // post inview + load more
+                        // not id's
+                        $container.find('.item').each( function( index ){
+                            loadedids[index] = $(this).data('id');
+                        });
+                    }else{
+                        $container.fadeOut( 200, function(){
+                            $container.html('');
+                            $container.fadeIn();
+                        });
+                    }
+                    console.log( prevfilter +' vs '+ filter);
+
+                    var filter_data = { 'tags' : filter.join(), 'notids' : loadedids.join(), 'ppp' : 2 };
+                    console.log(loadedids.join());
 
                     $.ajax({
                     url: filter_vars.filter_ajax_url,
@@ -185,6 +227,8 @@ jQuery(function($) {
                         'action': 'multi_filter', // function to execute
 				        'filter_nonce': filter_vars.filter_nonce, // wp_nonce
 				        'filter_data': filter_data, // selected data filters
+                        'query': filter_vars.posts, // that's how we get params from wp_localize_script() function
+			            'page' : filter_vars.current_page
                     }, // form data
                     dataType: 'json',
                     type: 'POST', // POST
@@ -192,8 +236,12 @@ jQuery(function($) {
                     },
                     success:function(result){
                         // Display posts on page
-                        var html = markupFilterData(result);
-                        $container.html( html );
+                        filter_vars.current_page++;
+                        if( result[0] != 'No posts found' ){
+                        markupFilterData(result);
+                        }
+                        console.log( result[0] );
+                        //$container.html( html );
                         //$container.html( '['+data+']' );
                     }
                 });
@@ -201,13 +249,20 @@ jQuery(function($) {
 
             function markupFilterData(data){
 
-                var html = '';
+
                 $.each( data, function(idx,obj){
-                        html += obj.title;
+                        var html = '';
+                        html += '<div class="item" data-id="'+obj.id+'" data-tags="'+obj.tags+'">';
+                        html += '<div>'+obj.title+'</div>';
+                        html += '<div>'+obj.content+'</div>';
+                        html += '<div>'+obj.tags+'</div>';
+                        html += '<div>'+obj.cats+'</div>';
+                        html += '</div>';
+                        $container.append( html );
                 });
 
-                return html;
 
+                //return html;
                 //return JSON.stringify(data);
             }
 

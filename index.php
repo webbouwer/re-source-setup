@@ -118,7 +118,9 @@ function resource_tag_filter_menu() {
                 </div>
 
             </div>
-
+            <div class="loadmore">
+                Load more
+            </div>
             <div id="mainfiltercontainer">
             <?php
             /**
