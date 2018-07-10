@@ -3,9 +3,7 @@
  * Include more functions
  */
 require get_template_directory() . '/customizer.php'; // customizer functions
-require get_template_directory() . '/posts.php'; // post ajax functions
-require get_template_directory() . '/view.php'; // view functions
-require get_template_directory() . '/control.php'; // control functions
+require get_template_directory() . '/data.php'; // view functions
 
 /* unregister widgets (if really not needed)"*/
  function remove_default_widgets() {
@@ -69,6 +67,8 @@ function basic_setup_widgets_init() {
 	}
 }
 add_action( 'widgets_init', 'basic_setup_widgets_init' );
+
+
 
 /**
  * Global most used functions

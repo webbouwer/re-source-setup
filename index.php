@@ -1,5 +1,29 @@
 <?php
 require_once('functions.php');
+
+
+/**
+ * Theme functions
+ * AJAX simple tag filter menu
+ * action in index.php (html)
+ */
+function resource_tag_filter_menu() {
+    $tax = 'post_tag';
+    $terms = get_terms( $tax );
+    $count = count( $terms );
+
+    if ( $count > 0 ): ?>
+        <div id="tagfilterbox">
+        <?php
+        foreach ( $terms as $term ) {
+            $term_link = get_term_link( $term, $tax );
+            echo '<a href="' . $term_link . '" class="tag-filter ' . $term->slug . '" title="' . $term->name . '" data-slug="' . $term->slug . '">' . $term->name . '</a> ';
+        } ?>
+        </div>
+    <?php endif;
+}
+
+
 ?>
 <!DOCTYPE html>
 <html <?php language_attributes(); ?> class="no-js no-svg">
@@ -47,52 +71,83 @@ require_once('functions.php');
 
 	<div id="pagecontainer" class="site">
 
-        <?php
-        echo '<div id="site-navigation" class="main-navigation '.$mainbarclass.' '.$mainminisize.'" role="navigation"><nav>';
-        if ( has_nav_menu( 'mainmenu' ) ) {
-            wp_nav_menu( array( 'theme_location' => 'mainmenu' ) );
-        }else{
-            wp_nav_menu( array( 'theme_location' => 'primary', 'menu_class' => 'nav-menu' ) );
-        }
-        echo '<div class="clr"></div></nav></div>';
-        ?>
+        <div id="topcontentcontainer">
 
-        <?php
-        /**
-         * Widgets Header
-         */
-        if( function_exists('is_sidebar_active') && is_sidebar_active('widgets-header') ){
-            echo '<div id="widgets-header">';
-            dynamic_sidebar('widgets-header');
-            echo '<div class="clr"></div></div>';
-        }
-        ?>
+            <div id="headerbar">
+            <?php
+            /**
+             * Widgets Header
+             */
+            if( function_exists('is_sidebar_active') && is_sidebar_active('widgets-header') ){
+                echo '<div id="widgets-header">';
+                dynamic_sidebar('widgets-header');
+                echo '<div class="clr"></div></div>';
+            }
+            ?>
+            </div>
 
-        <div id="contentcontainer">
         </div>
 
-        <?php
-        /**
-         * Widgets Top Sidebar
-         */
-        if( function_exists('is_sidebar_active') && is_sidebar_active('widgets-top-sidebar') ){
-            echo '<div id="widgets-top-sidebar">';
-            dynamic_sidebar('widgets-top-sidebar');
-            echo '<div class="clr"></div></div>';
-        }
-        ?>
+        <div id="maincontentcontainer">
 
-        <?php
-        /**
-         * Widgets Sidebar
-         */
-        if( function_exists('is_sidebar_active') && is_sidebar_active('sidebar') ){
-            echo '<div id="sidebar">';
-            dynamic_sidebar('sidebar');
-            echo '<div class="clr"></div></div>';
-        }
-        ?>
+            <div id="mainmenucontainer">
+                <?php
+                echo '<div id="site-navigation" class="main-navigation '.$mainbarclass.' '.$mainminisize.'" role="navigation"><nav>';
+                if ( has_nav_menu( 'mainmenu' ) ) {
+                    wp_nav_menu( array( 'theme_location' => 'mainmenu' ) );
+                }else{
+                    wp_nav_menu( array( 'theme_location' => 'primary', 'menu_class' => 'nav-menu' ) );
+                }
+                echo '<div class="clr"></div></nav></div>';
+                ?>
+            </div>
 
+            <div id="pagecontainer">
+            </div>
+
+            <div id="mainlistcontainer">
+
+                <div id="postlistbox">
+                </div>
+
+            </div>
+
+            <div id="postcontainer">
+
+                <div id="itemcontainer">
+                </div>
+
+            </div>
+
+            <div id="mainfiltercontainer">
+            <?php
+            /**
+             * Widgets Top Sidebar
+             */
+            if( function_exists('is_sidebar_active') && is_sidebar_active('widgets-top-sidebar') ){
+                echo '<div id="widgets-top-sidebar">';
+                dynamic_sidebar('widgets-top-sidebar');
+                echo '<div class="clr"></div></div>';
+            }
+            ?>
+
+            <?php resource_tag_filter_menu(); ?>
+
+            <?php
+            /**
+             * Widgets Sidebar
+             */
+            if( function_exists('is_sidebar_active') && is_sidebar_active('sidebar') ){
+                echo '<div id="sidebar">';
+                dynamic_sidebar('sidebar');
+                echo '<div class="clr"></div></div>';
+            }
+            ?>
+            </div>
+
+    </div>
+
+    <div id="bottomcontentcontainer">
     </div>
 
 	<?php wp_footer(); ?>
