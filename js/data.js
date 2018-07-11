@@ -6,28 +6,22 @@ jQuery(function($) {
 
 
 	$(document).ready(function(){
-
-		// taglib = [] all tags
-		// catlib = [[]] all (sub)categories
-
-		// basefilter = [];
-		// usefilter = [];
-
-		//
 	});
-$(document).ajaxStart(function() {
-  if( $("#loadmsgbox").length < 1 ){
-    $('body').append('<div id="loadmsgbox">Loading..</div>');
-  }
-});
 
-$(document).ajaxComplete(function() { // http://api.jquery.com/ajaxstop/
-//$container.imagesLoaded(function(){
-    $("#loadmsgbox").remove();
-		//$("html").niceScroll();
-		//$('#menucontainer').niceScroll();
-  //});
-});
+    $(document).ajaxStart(function() {
+      if( $("#loadmsgbox").length < 1 ){
+        $('body').append('<div id="loadmsgbox">Loading..</div>');
+      }
+    });
+
+    $(document).ajaxComplete(function() { // http://api.jquery.com/ajaxstop/
+    //$container.imagesLoaded(function(){
+        $("#loadmsgbox").remove();
+            //$("html").niceScroll();
+            //$('#menucontainer').niceScroll();
+      //});
+    });
+
 	$(window).load(function() {
 
         var container = $("#itemcontainer"),
@@ -88,14 +82,16 @@ $(document).ajaxComplete(function() { // http://api.jquery.com/ajaxstop/
                 });
 
                 activeFilterMenu( tagfilter, catfilter );
-                activeFilterData( tagfilter, catfilter );
+                activeFilterData( tagfilter, catfilter, idloaded );
                 setNewHash( tagfilter, catfilter );
 
                 filterClass = '*';
                 if( tagfilter.length > 0 ){
                     filterClass = '.'+tagfilter.join(',.');
                 }
-
+                if( catfilter.length > 0 ){
+                    filterClass = '.'+catfilter.join(',.');
+                }
         });
 
         // on active filter click (tag)
@@ -110,14 +106,12 @@ $(document).ajaxComplete(function() { // http://api.jquery.com/ajaxstop/
 
 
         //
-        function activeFilterData( tagfilter = [], catfilter = [] ){
-
-
+        function activeFilterData( tagfilter = [], catfilter = [], idloaded = [] , ppload = 99 ){
 
                 var filter_data = {
                     'tagfilter' : tagfilter.join(),
                     'catfilter' : catfilter.join(),
-                    'idloaded' : idloaded.join(),
+                    'idloaded' : idloaded,
                     'ppload' : ppload
                 };
 
@@ -127,28 +121,20 @@ $(document).ajaxComplete(function() { // http://api.jquery.com/ajaxstop/
                         'action': 'multi_filter', // function to execute
 				        'filter_nonce': filter_vars.filter_nonce, // wp_nonce
 				        'filter_data': filter_data, // selected data filters
-                        //'query': filter_vars.filter_query, // that's how we get params from wp_localize_script() function
                     }, // form data
                     dataType: 'json',
                     type: 'POST', // POST
                     beforeSend:function(xhr){
                     },
                     success:function(result){
-                        // Display posts on page
                         if( result[0] != 'No posts found' ){
-                            markupFilterData(result);
-                            //$("#itemcontainer").html( JSON.stringify(result) );
+                            markupFilterData(result);//$("#itemcontainer").html( JSON.stringify(result) );
                         }
-
                         $('.item').each( function(){
                             $(this).removeClass('active');
                             newTagWeight( this, tagfilter );
                         });
-
-
-                        console.log( result );
-                        //$container.html( html );
-                        //$container.html( '['+data+']' );
+                        console.log( result ); //$container.html( '['+data+']' );
                     }
                 });
 
@@ -156,16 +142,11 @@ $(document).ajaxComplete(function() { // http://api.jquery.com/ajaxstop/
         }
 
         function markupFilterData(result){
-
-
                 $.each( result, function(idx,obj){
                     if( $('#post-'+obj.id).length > 0 ){
-
                     }else{
                         var html = '';
-                        html += '<div id="post-'+obj.id+'" class="item" data-id="'+obj.id+'" data-tags="'+obj.tags+'">';
-
-
+                        html += '<div id="post-'+obj.id+'" class="item" data-id="'+obj.id+'" data-tags="'+obj.tags+'" data-cats="'+obj.cats+'">';
                         html += '<div>'+obj.title+'</div>';
                         html += '<div class="itemcontent">'+obj.content+'</div>';
                         html += '<div>'+obj.tags+'</div>';
@@ -175,9 +156,7 @@ $(document).ajaxComplete(function() { // http://api.jquery.com/ajaxstop/
                         container.append( html );
                     }
                 });
-
         }
-
 
         function getHashUrlVars(){
                 var vars = [], hash;
@@ -189,7 +168,7 @@ $(document).ajaxComplete(function() { // http://api.jquery.com/ajaxstop/
                     vars[hash[0]] = hash[1];
                 }
                 return vars;
-            }
+        }
 
 
             function setNewHash( tags = [], cats = [] ){
@@ -208,7 +187,7 @@ $(document).ajaxComplete(function() { // http://api.jquery.com/ajaxstop/
             }
 
             // active tag menu
-            function activeFilterMenu( tags = [], cats = [] ){
+            function activeFilterMenu( tagfilter = [], catfilter = [] ){
 
                 if( $('#activefilterbox').length < 1 ){
                     $('<div id="activefilterbox"></div>').insertBefore("#tagfilterbox");
@@ -216,7 +195,7 @@ $(document).ajaxComplete(function() { // http://api.jquery.com/ajaxstop/
 
                 $('#tagfilterbox .tag-filter').each( function(){
                     $(this).removeClass('selected');
-                    if( $.inArray( $(this).data('slug') , tags ) > -1 ){
+                    if( $.inArray( $(this).data('slug') , tagfilter ) > -1 ){
                         $(this).addClass('selected');
                     }
                 });
@@ -230,10 +209,13 @@ $(document).ajaxComplete(function() { // http://api.jquery.com/ajaxstop/
                     newTagWeight( this, tags );
                 });*/
 
-                if( tags.length > 0 ){
-                    filterClass = '.'+tags.join(',.');
+                if( tagfilter.length > 0 ){
+                    filterClass = '.'+tagfilter.join(',.');
                 }
-                console.log('filter:' + tags.join() +' ('+filterClass+')');
+                if( catfilter.length > 0 ){
+                    filterClass = '.'+catfilter.join(',.');
+                }
+                console.log('filter:' + tagfilter.join() +' ('+filterClass+')');
 
             }
 

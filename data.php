@@ -40,9 +40,9 @@ class WPData{
         die('Permission denied');
 
         // verify request data
-        $tags = $_REQUEST['filter_data']['tagfilter'];
-        $cats = $_REQUEST['filter_data']['catfilter'];
-        //$idloaded = $_REQUEST['filter_data']['idloaded'];
+        $tagfilter = $_REQUEST['filter_data']['tagfilter'];
+        $catfilter = $_REQUEST['filter_data']['catfilter'];
+        $idloaded = $_REQUEST['filter_data']['idloaded'];
         $ppload = $_REQUEST['filter_data']['ppload'];
 
         // id? -> get single post
@@ -50,26 +50,26 @@ class WPData{
         // cats? -> if array -> cats to cvs
 
         $args = array(
-            'tag' => $tags,
-            'category_name' => $cats,
+            'tag' => $tagfilter,
+            'category_name' => $catfilter,
             'post_type' => 'post', // 'any',  = incl pages
             'post_status' => 'publish',
-            //'post__not_in' => $idloaded,
+            'post__not_in' => $idloaded,
             'posts_offset' => $ppload,
             'posts_per_page' => $ppload,
             'orderby'        => 'date',
             'order'          => 'DESC',      // 'DESC', 'ASC' or 'RAND'
         );
 
-        if( !$tags || $tags == '') {
+        if( !$tagfilter || $tagfilter == '') {
             unset( $args['tag'] );
         }
-        if( !$cats || $cats == '') {
+        if( !$catfilter || $catfilter == '') {
             unset( $args['cats'] );
         }
-        //if( !$idloaded || $idloaded == '') {
-            //unset( $args['post__not_in'] );
-        //}
+        if( !$idloaded || $idloaded == '') {
+            unset( $args['post__not_in'] );
+        }
         if( !$ppload || $ppload < 1 ) {
             $args['posts_per_page'] = 10;
         }
