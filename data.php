@@ -28,9 +28,7 @@ class WPData{
             'filter_nonce' => wp_create_nonce( 'filter_nonce' ), // Create nonce
             'filter_ajax_url' => admin_url( 'admin-ajax.php' ),
             'filter_noposts'  => esc_html__('No older posts found', 're_source'),
-            'posts' => json_encode( $wp_query->query_vars ), // everything about your loop is here
-		    'current_page' => get_query_var( 'paged' ) ? get_query_var('paged') : 1,
-		    'max_page' => $wp_query->max_num_pages
+            //'filter_query' => json_encode( $wp_query->query_vars ), // everything about your loop is here
             )
         );
     }
@@ -42,37 +40,39 @@ class WPData{
         die('Permission denied');
 
         // verify request data
-        $wpdata = $_REQUEST;
+        $tags = $_REQUEST['filter_data']['tagfilter'];
+        $cats = $_REQUEST['filter_data']['catfilter'];
+        //$idloaded = $_REQUEST['filter_data']['idloaded'];
+        $ppload = $_REQUEST['filter_data']['ppload'];
 
         // id? -> get single post
-
         // tags? -> if array -> tags to cvs
-
         // cats? -> if array -> cats to cvs
-        $tags = $wpdata['filter_data']['tags'];
-        $cats = $wpdata['filter_data']['cats'];
 
         $args = array(
             'tag' => $tags,
-            //'category_name' => $cats,
+            'category_name' => $cats,
             'post_type' => 'post', // 'any',  = incl pages
             'post_status' => 'publish',
-            //'post__not_in' => $wpdata['filter_data']['notids'],
-            //'posts_offset' => count($wpdata['filter_data']['notids']),
-            //'posts_per_page' =>  $wpdata['filter_data']['ppp'],
-            //'order'          => 'DESC',      // 'DESC', 'ASC' or 'RAND'
-            //'orderby'        => 'date',
+            //'post__not_in' => $idloaded,
+            'posts_offset' => $ppload,
+            'posts_per_page' => $ppload,
+            'orderby'        => 'date',
+            'order'          => 'DESC',      // 'DESC', 'ASC' or 'RAND'
         );
 
-        if( !$wpdata['filter_data']['tags'] || $wpdata['filter_data']['tags'] == '') {
+        if( !$tags || $tags == '') {
             unset( $args['tag'] );
-        }if( !$wpdata['filter_data']['cats'] || $wpdata['filter_data']['cats'] == '') {
+        }
+        if( !$cats || $cats == '') {
             unset( $args['cats'] );
         }
-        if( !$wpdata['filter_data']['notids']  || $wpdata['filter_data']['notids'] == '') {
-            unset( $args['post__not_in'] );
+        //if( !$idloaded || $idloaded == '') {
+            //unset( $args['post__not_in'] );
+        //}
+        if( !$ppload || $ppload < 1 ) {
+            $args['posts_per_page'] = 10;
         }
-
 
         // prepare response $response = $wpdata['filter_data']['tags'];
         $query = new WP_Query( $args );
@@ -97,7 +97,6 @@ class WPData{
         else:
            $response[0] = 'No posts found';
         endif;
-
 
         wp_reset_query();
         ob_clean();
