@@ -1,0 +1,136 @@
+/** isotope item filter styles */
+
+#itemcontainer
+{
+position:relative;
+width:100%;
+min-height:100%;
+}
+
+.item,
+.base,
+.size-s {
+  width: 14.29%;
+  min-height:150px;
+  overflow:hidden;
+}
+.item.active{
+}
+.size-m  {
+  width: 28.57%;
+  min-height:450px;
+}
+.size-l {
+  width: 42.86%;
+  min-height:300px;
+}
+
+.itemcontent {
+  /*min-width: 100%;
+  min-height:100%;
+  background: blue;*/
+}
+
+
+.item.active {
+  width: 57.1428%;
+  min-height:450px;
+}
+.itemcontent .intro
+{
+display:block;
+width:100%;
+}
+.itemcontent .intro img
+{
+display:block;
+width:100%;
+height: auto;
+}
+.itemcontent .main
+{
+display:none;
+}
+.item.active .itemcontent .main
+{
+display:block;
+}
+.item.active .itemcontent .intro
+{
+width:auto;
+max-width:100%;
+}
+.item.active .itemcontent .intro img
+{
+max-width:100%;
+width: auto;
+heigth: auto;
+}
+.item iframe
+{
+max-width:100% !important;
+height:auto !important;
+}
+.item.active iframe
+{
+max-width:100% !important;
+height:auto !important;
+min-height: 300px;
+}
+
+
+@media screen and (max-width: 640px) {
+.item,
+.base,
+.size-s {
+  width: 33.33%;
+  min-height:150px;
+}
+.size-m  {
+  width: 66.66%;
+  min-height:450px;
+}
+.size-l {
+  width: 100%;
+  min-height:300px;
+}
+
+.itemcontent {
+  /*min-width: 100%;
+  min-height:100%;*/
+}
+
+.item.active {
+  width: 100%;
+  min-height:450px;
+}
+}
+
+/**** Isotope CSS3 transitions ****/
+
+
+#itemcontainer,
+#itemcontainer .item {
+   -webkit-transition: all 0.5s easeIn;
+    -moz-transition: all 0.5s easeIn;
+    -o-transition: all 0.5s easeIn;
+    transition: all 0.5s easeIn;
+}
+#itemcontainer,
+#itemcontainer .item {
+   -webkit-transition: all 0.5s easeIn;
+    -moz-transition: all 0.5s easeIn;
+    -o-transition: all 0.5s easeIn;
+    transition: all 0.5s easeIn;
+}
+
+#itemcontainer {
+  -webkit-transition-property: height, width;
+     -moz-transition-property: height, width;
+          transition-property: height, width;
+}
+.isotope .isotope-item {
+  -webkit-transition-property: -webkit-transform, opacity;
+     -moz-transition-property:    -moz-transform, opacity;
+          transition-property:         transform, opacity;
+}

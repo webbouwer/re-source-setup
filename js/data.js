@@ -8,19 +8,6 @@ jQuery(function($) {
 	$(document).ready(function(){
 	});
 
-    $(document).ajaxStart(function() {
-      if( $("#loadmsgbox").length < 1 ){
-        $('body').append('<div id="loadmsgbox">Loading..</div>');
-      }
-    });
-
-    $(document).ajaxComplete(function() { // http://api.jquery.com/ajaxstop/
-    //$container.imagesLoaded(function(){
-        $("#loadmsgbox").remove();
-            //$("html").niceScroll();
-            //$('#menucontainer').niceScroll();
-      //});
-    });
 
     /**
      * On load
@@ -35,7 +22,8 @@ jQuery(function($) {
             idloaded  = [],
             ppload    = 10,
             filterData  = [],
-            filterClass = '';
+            filterClass = '',
+            activeItem = false;
 
         // isotope
         var $colWidth = container.width()/7,
@@ -57,15 +45,9 @@ jQuery(function($) {
         }
 
         activeFilterMenu( tagfilter, catfilter );
-        activeFilterData( tagfilter, catfilter );
-        setNewHash( tagfilter, catfilter );
+        //activeFilterData( tagfilter, catfilter );
+        //setNewHash( tagfilter, catfilter );
 
-        if( tagfilter.length > 0 ){
-            filterClass = '.'+tagfilter.join(',.');
-        }
-        if( catfilter.length > 0 ){
-            filterClass = '.'+catfilter.join(',.');
-        }
 
         /**
          * On Tag Filter
@@ -86,22 +68,11 @@ jQuery(function($) {
                 $('#tagfilterbox .tag-filter.selected').each( function( index ){
                     tagfilter[index] = $(this).data('slug');
                 });
-
-                $('.item').each( function( index ){
-                    idloaded[index] = $(this).data('id');
-                });
-
+                activeItem = false;
                 activeFilterMenu( tagfilter, catfilter );
-                activeFilterData( tagfilter, catfilter, idloaded );
-                setNewHash( tagfilter, catfilter );
+                //activeFilterData( tagfilter, catfilter, idloaded );
+                //setNewHash( tagfilter, catfilter );
 
-                filterClass = '*';
-                if( tagfilter.length > 0 ){
-                    filterClass = '.'+tagfilter.join(',.');
-                }
-                if( catfilter.length > 0 ){
-                    filterClass = '.'+catfilter.join(',.');
-                }
         });
 
         /**
@@ -131,22 +102,19 @@ jQuery(function($) {
 
     		var $this = $(this);
 
-    		$currCat = $this.attr('data-cats').split(',')[0]; //alert($this.find('.itemcontent').text());
+            $('.item').removeClass('active');
+
+    		$currCat = $this.attr('data-category'); //alert($this.find('.itemcontent').text());
 
 			tagfilter = $this.attr('data-tags').split(',');
-
+            catfilter = $this.attr('data-category');
+            activeItem = $this;
             activeFilterMenu( tagfilter, catfilter );
-            activeFilterData( tagfilter, catfilter, idloaded );
-			setNewHash( tagfilter, catfilter );
+            //activeFilterData( tagfilter, catfilter, idloaded );
+			//setNewHash( tagfilter, catfilter );
 
 
-			$this.addClass('active');
-
-	      	filterClass = '*';
-			if( tagfilter.length > 0 ){
-				filterClass = '.'+tagfilter.join(',.');
-			}
-
+            /*
 	  		container
 	  	  	//.isotope({ masonry: { columnWidth: $colWidth } })
 	        .prepend($this)
@@ -154,7 +122,7 @@ jQuery(function($) {
 			.isotope('updateSortData')
 	        .isotope('reloadItems')
 	        .isotope({
-				sortBy: [ 'byCategory', 'byTagWeight' ],
+				sortBy: 'byCategory',//[ 'byCategory', 'byTagWeight' ],
 				sortAscending: {
 				  byCategory: true, // name ascendingly
 				  byTagWeight: false, // weight descendingly
@@ -162,15 +130,57 @@ jQuery(function($) {
 			});  // 'original-order'
 
 			setColumnWidth();
+            */
 
+            //setIsotope( filterClass );
 
-	        $('html, body').animate({scrollTop:0}, 400);
 
   		});
 
 
 
 
+            /**
+            * Tag Filter Menu
+            */
+            function activeFilterMenu( tagfilter = [], catfilter = [] ){
+
+                if( $('#activefilterbox').length < 1 ){
+                    $('<div id="activefilterbox"></div>').insertBefore("#tagfilterbox");
+                }
+                // set active tagfilter
+                $('#tagfilterbox .tag-filter').each( function(){
+                    $(this).removeClass('selected');
+                    if( $.inArray( $(this).data('slug') , tagfilter ) > -1 ){
+                        $(this).addClass('selected');
+                    }
+                });
+                // set active tag menu
+                $('#activefilterbox').html('');
+                $('#tagfilterbox .tag-filter.selected').each( function(){
+                    $(this).clone().appendTo('#activefilterbox');
+                });
+                // get loaded id's
+                $('.item').each( function( index ){
+                    idloaded[index] = $(this).data('id');
+                });
+                // get filter Classes
+                filterClass = '';
+                if( tagfilter.length > 0 ){
+                    filterClass = '.'+tagfilter.join(',.');
+                }
+                if( catfilter.length > 0 ){
+                    filterClass = '.'+catfilter.join(',.');
+                }
+                if( tagfilter.length < 1 && catfilter.length < 1 ){
+                    filterClass = '*';
+                }
+                // load filter data
+                activeFilterData( tagfilter, catfilter, idloaded );
+                // set url hash
+                setNewHash( tagfilter, catfilter );
+
+            }
 
 
 
@@ -180,7 +190,9 @@ jQuery(function($) {
         /**
          * On active Filter
          */
-        function activeFilterData( tagfilter = [], catfilter = [], idloaded = [] , ppload = 99 ){
+        function activeFilterData( tagfilter = [], catfilter = [], idloaded = [] , ppload = 10 ){
+
+             if( idloaded.length < 10 ){
 
                 var filter_data = {
                     'tagfilter' : tagfilter.join(),
@@ -201,36 +213,18 @@ jQuery(function($) {
                     beforeSend:function(xhr){
                     },
                     success:function(result){
+
                         if( result[0] != 'No posts found' ){
-                            markupFilterData(result);//$("#itemcontainer").html( JSON.stringify(result) );
+
+                            markupFilterData( result ); //$("#itemcontainer").html( JSON.stringify(result) );
+                            console.log( result ); //$container.html( '['+data+']' );
                         }
-                        $('.item').each( function(){
-                            $(this).removeClass('active');
-                            newTagWeight( this, tagfilter );
-                        });
-                        console.log( result ); //$container.html( '['+data+']' );
-
-
-
-                            filterClass = '*';
-                            if( tagfilter.length > 0 ){
-                                filterClass = '.'+tagfilter.join(',.');
-                            }
-                            if( catfilter.length > 0 ){
-                                filterClass = '.'+catfilter.join(',.');
-                            }
-
-                        if( idloaded.length < 1 ){
-
-                            startIsotope( filterClass );
-
-                        }else{
-                            setIsotope( filterClass );
-                        }
-
+                        setActiveView( tagfilter, catfilter );
                     }
                 });
-
+             }else{
+                 setActiveView( tagfilter, catfilter );
+             }
 
         }
 
@@ -238,6 +232,7 @@ jQuery(function($) {
          * Markup Data Result
          */
         function markupFilterData(result){
+
                 $.each( result, function(idx,obj){
                     if( $('#post-'+obj.id).length > 0 ){
                     }else{
@@ -253,8 +248,17 @@ jQuery(function($) {
                         html += '<div id="post-'+obj.id+'" data-id="'+obj.id+'" ';
                         html += 'class="item '+filterclass+'" ';
                         html += 'data-tags="'+obj.tags+'" data-cats="'+obj.cats+'">';
+
+
+
                         html += '<div>'+obj.title+'</div>';
-                        html += '<div class="itemcontent">'+obj.content+'</div>';
+                        html += '<div class="itemcontent">';
+                         html += '<div class="intro">';
+                        if( obj.image && obj.image != ''){
+                         html += obj.image;
+                           }
+                         html += obj.excerpt+'</div>';
+                         html += '<div class="main">'+obj.content+'</div></div>';
                         html += '<div>'+obj.tags+'</div>';
                         html += '<div>'+obj.cats+'</div>';
                         html += '<div class="matchweight">3</div>';
@@ -262,6 +266,30 @@ jQuery(function($) {
                         container.append( html );
                     }
                 });
+
+        }
+
+        function setActiveView( tagfilter = [], catfilter = [] ){
+
+                        $('.item').each( function(){
+                            newTagWeight( this, tagfilter );
+                        });
+
+                        filterClass = '*';
+                        if( tagfilter.length > 0 ){
+                            filterClass = '.'+tagfilter.join(',.');
+                        }
+                        if( catfilter.length > 0 ){
+                            filterClass = '.'+catfilter.join(',.');
+                        }
+
+                        if( idloaded.length < 1 ){
+                            $('.item').first().addClass('base');
+                            startIsotope( filterClass );
+                        }else{
+                            setIsotope( filterClass );
+                        }
+
         }
 
         /**
@@ -297,41 +325,6 @@ jQuery(function($) {
                 }
             }
 
-           /**
-            * Tag Filter Menu
-            */
-            function activeFilterMenu( tagfilter = [], catfilter = [] ){
-
-                if( $('#activefilterbox').length < 1 ){
-                    $('<div id="activefilterbox"></div>').insertBefore("#tagfilterbox");
-                }
-
-                $('#tagfilterbox .tag-filter').each( function(){
-                    $(this).removeClass('selected');
-                    if( $.inArray( $(this).data('slug') , tagfilter ) > -1 ){
-                        $(this).addClass('selected');
-                    }
-                });
-                $('#activefilterbox').html('');
-                $('#tagfilterbox .tag-filter.selected').each( function(){
-                    $(this).clone().appendTo('#activefilterbox');
-                });
-                /*
-                $('.item').each( function(){
-                    $(this).removeClass('active');
-                    newTagWeight( this, tags );
-                });*/
-
-                if( tagfilter.length > 0 ){
-                    filterClass = '.'+tagfilter.join(',.');
-                }
-                if( catfilter.length > 0 ){
-                    filterClass = '.'+catfilter.join(',.');
-                }
-                console.log('filter:' + tagfilter.join() +' ('+filterClass+')');
-
-            }
-
 
             /**
             * Item Weight Tag Filter
@@ -339,11 +332,11 @@ jQuery(function($) {
             function newTagWeight( obj, filter ){
 
                 var tags = $(obj).data('tags').split(',');
-                var newSize = 'size-s';
-                $(obj).removeClass('size-l size-m size-s');
-                var mc = 0;
-                if( tags.length > 0  && filter.length > 0){
 
+                var mc = 0;
+                var newSize = 'size-s';
+
+                if( tags.length > 0  && filter.length > 0){
 
                         for(i=0;i<tags.length;i++){
                             //if( basefilter[tags[i]] ){
@@ -355,22 +348,34 @@ jQuery(function($) {
 
                         var percent = 100 / filter.length * mc;
 
-                        if( percent > 85 ){
+                        if( percent > 75 ){
                             newSize = 'size-l';
-                        }else if( percent > 55 ){
+                        }else if( percent > 50 ){
                             newSize = 'size-m';
                         }
                         // console.log('match:' + newSize );
+
                 }else{  // restore weight to tag count vs empty filter
+
                     $(obj).find('.matchweight').text(tags.length);
+
                 }
+
+                //
+                $(obj).removeClass('size-l size-m size-s');
+
+                $(obj).addClass(newSize);
+
+
+
                 /*
                 if( mc > 0 ){
-                   $(obj).addClass(newSize).fadeIn();
+                    $(obj).addClass(newSize).fadeIn();
                 }else{
-                   $(obj).fadeOut();
+                    $(obj).fadeOut();
                 }
                 */
+
 
             }
 
@@ -381,12 +386,13 @@ jQuery(function($) {
                 */
 
                 // init isotope
+
                 container.isotope({
 
                     itemSelector: '.item',
                     layoutMode: 'masonry',
                     animationEngine: 'best-available',
-                    transitionDuration: '0.8s',
+                    transitionDuration: '1s',
                     masonry: {
                     //isFitWidth: true,
                     //columnWidth: '.base',
@@ -398,36 +404,43 @@ jQuery(function($) {
                         },
                         byTagWeight: '.matchweight parseInt',
                     },
-                    sortBy : 'byTagWeight', //[ 'byCategory', 'byTagWeight' ],
+                    sortBy :[ 'byCategory', 'byTagWeight' ],
                     sortAscending: {
                               //byCategory: true, // name ascendingly
                               byTagWeight: false, // weight descendingly
                     },
                 });
 
-                container.isotope({ filter: filterClass }).isotope('updateSortData').isotope( 'layout' );
-
                 setColumnWidth(); // ! important to get the column width for first layout
+                container.isotope({ filter: filterClass }).isotope('updateSortData');//.isotope( 'layout' );
 
             }
 
             function setIsotope( filterClass ){
+
+                if( activeItem != false ){
+                    activeItem.removeClass('size-l size-m size-s');
+                    activeItem.addClass('size-l');
+                    container.prepend(activeItem).addClass('active');
+                }
+
 
                 container
                 .isotope({ filter: filterClass })
                 .isotope('updateSortData')
                 .isotope('reloadItems')
                 .isotope({
-                    sortBy : 'byTagWeight', //[ 'byCategory', 'byTagWeight' ],
+                    sortBy : [ 'byCategory', 'byTagWeight' ],
                     sortAscending: {
                           //byCategory: true, // name ascendingly
                           byTagWeight: false, // weight descendingly
                     },
-                }); // 'original-order'
+                });//.isotope( 'layout' ); // 'original-order'
+
+                setColumnWidth(); // ! important to get the column width for first layout
                 $('html, body').animate({scrollTop:0}, 400);
 
             }
-
 
             // on resize isotope
             var resizeId;
@@ -453,6 +466,19 @@ jQuery(function($) {
             }
 
 
+             $(document).ajaxStart(function() {
+                  if( $("#loadmsgbox").length < 1 ){
+                    $('body').append('<div id="loadmsgbox">Loading..</div>');
+                  }
+                });
+
+                $(document).ajaxComplete(function() { // http://api.jquery.com/ajaxstop/
+                    container.imagesLoaded(function(){
+                    $("#loadmsgbox").remove();
+                        //$("html").niceScroll();
+                        //$('#menucontainer').niceScroll();
+                    });
+                });
 
 
 

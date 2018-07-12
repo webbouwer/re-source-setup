@@ -14,17 +14,59 @@ Tags: theme-options, custom-menu, full-width-template, featured-image-header, fe
 
 
 /* Temp dev style */
+*
+{
+    margin:0;
+    padding:0;
+}
 body
 {
 font-family: "Typewriter", helvetica, serif;
 font-size:13px;
-color: lightgray;
-background-color: black;
+color: black;
+background-color: white;
 }
 a{
-color: mediumpurple;
+color: black;
 }
 a.active
 {
-color: lawngreen;
+color: #232323;
+}
+#mainmenucontainer
+{
+    position: relative;
+    display: block;
+    float:left;
+    width:25%;
+}
+#postcontainer
+{
+    position: relative;
+    display: block;
+    float:left;
+    width:50%;
+}
+#mainfiltercontainer
+{
+    position: relative;
+    float:right;
+    width:25%;
+}
+.item,
+.base,
+.size-s {
+  width: 14.29%;
+  min-height:150px;
+    color:#232323;
+  background: white;
+  overflow:hidden;
+}
+.item.active{
+  background: white;
+}
+
+.tag-filter.selected
+{
+font-weight:bold;
 }
