@@ -28,7 +28,6 @@ class WPData{
             'filter_nonce' => wp_create_nonce( 'filter_nonce' ), // Create nonce
             'filter_ajax_url' => admin_url( 'admin-ajax.php' ),
             'filter_noposts'  => esc_html__('No older posts found', 're_source'),
-            //'filter_query' => json_encode( $wp_query->query_vars ), // everything about your loop is here
             )
         );
 
@@ -43,7 +42,7 @@ class WPData{
         // verify request data
         $tagfilter = $_REQUEST['filter_data']['tagfilter'];
         $catfilter = $_REQUEST['filter_data']['catfilter'];
-        $idloaded = $_REQUEST['filter_data']['idloaded'];
+        $loadedID = $_REQUEST['filter_data']['loadedID'];
         $ppload = $_REQUEST['filter_data']['ppload'];
 
         $args = array(
@@ -51,7 +50,7 @@ class WPData{
             'category_name' => $catfilter,
             'post_type' => 'post', // 'any',  = incl pages
             'post_status' => 'publish',
-            'post__not_in' => $idloaded,
+            'post__not_in' => $loadedID,
             'posts_offset' => $ppload,
             'posts_per_page' => $ppload,
             'orderby'        => 'date',
@@ -64,7 +63,7 @@ class WPData{
         if( !$catfilter || $catfilter == '') {
             unset( $args['cats'] );
         }
-        if( !$idloaded || $idloaded == '') {
+        if( !$loadedID || $loadedID == '') {
             unset( $args['post__not_in'] );
         }
         if( !$ppload || $ppload < 1 ) {
@@ -90,7 +89,7 @@ class WPData{
                 'title' => get_the_title(),
                 'image' => get_the_post_thumbnail(),
                 'excerpt' => $excerpt,
-                'content' => $content,
+                'content' => apply_filters('the_content', get_the_content()),
                 'cats' => wp_get_post_terms( get_the_ID(), 'category', array("fields" => "slugs")),
                 'tags' => wp_get_post_terms( get_the_ID(), 'post_tag', array("fields" => "slugs")),
                 'date' => get_the_date(),
