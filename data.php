@@ -31,9 +31,10 @@ class WPData{
             //'filter_query' => json_encode( $wp_query->query_vars ), // everything about your loop is here
             )
         );
+
     }
 
-    function wp_data_multi_filter(){
+    public function wp_data_multi_filter(){
 
         // Verify nonce
         if( !isset( $_POST['filter_nonce'] ) || !wp_verify_nonce( $_POST['filter_nonce'], 'filter_nonce' ) || !isset($_REQUEST))
@@ -44,10 +45,6 @@ class WPData{
         $catfilter = $_REQUEST['filter_data']['catfilter'];
         $idloaded = $_REQUEST['filter_data']['idloaded'];
         $ppload = $_REQUEST['filter_data']['ppload'];
-
-        // id? -> get single post
-        // tags? -> if array -> tags to cvs
-        // cats? -> if array -> cats to cvs
 
         $args = array(
             'tag' => $tagfilter,

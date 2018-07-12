@@ -22,6 +22,9 @@ jQuery(function($) {
       //});
     });
 
+    /**
+     * On load
+     */
 	$(window).load(function() {
 
         var container = $("#itemcontainer"),
@@ -33,6 +36,11 @@ jQuery(function($) {
             ppload    = 10,
             filterData  = [],
             filterClass = '';
+
+        // isotope
+        var $colWidth = container.width()/7,
+        $currCat = '';
+
 
         $('#tagfilterbox .tag-filter').each( function( index ){
             alltags[index] = $(this).data('slug');
@@ -59,7 +67,9 @@ jQuery(function($) {
             filterClass = '.'+catfilter.join(',.');
         }
 
-
+        /**
+         * On Tag Filter
+         */
         $('body').on( 'click', '#tagfilterbox .tag-filter', function(event){
 
                 if (event.preventDefault) {
@@ -94,7 +104,9 @@ jQuery(function($) {
                 }
         });
 
-        // on active filter click (tag)
+        /**
+         * On active Tag Filter
+         */
         $('body').on( 'click', '#activefilterbox .tag-filter', function(event){
             if (event.preventDefault) {
                 event.preventDefault();
@@ -105,7 +117,69 @@ jQuery(function($) {
         });
 
 
-        //
+
+        /**
+         * On item click
+         */
+		container.on('click touchend', '.item', function(event){
+
+			if (event.preventDefault) {
+				event.preventDefault();
+			} else {
+				event.returnValue = false;
+			}
+
+    		var $this = $(this);
+
+    		$currCat = $this.attr('data-cats').split(',')[0]; //alert($this.find('.itemcontent').text());
+
+			tagfilter = $this.attr('data-tags').split(',');
+
+            activeFilterMenu( tagfilter, catfilter );
+            activeFilterData( tagfilter, catfilter, idloaded );
+			setNewHash( tagfilter, catfilter );
+
+
+			$this.addClass('active');
+
+	      	filterClass = '*';
+			if( tagfilter.length > 0 ){
+				filterClass = '.'+tagfilter.join(',.');
+			}
+
+	  		container
+	  	  	//.isotope({ masonry: { columnWidth: $colWidth } })
+	        .prepend($this)
+			.isotope({ filter: filterClass })
+			.isotope('updateSortData')
+	        .isotope('reloadItems')
+	        .isotope({
+				sortBy: [ 'byCategory', 'byTagWeight' ],
+				sortAscending: {
+				  byCategory: true, // name ascendingly
+				  byTagWeight: false, // weight descendingly
+				}
+			});  // 'original-order'
+
+			setColumnWidth();
+
+
+	        $('html, body').animate({scrollTop:0}, 400);
+
+  		});
+
+
+
+
+
+
+
+
+
+
+        /**
+         * On active Filter
+         */
         function activeFilterData( tagfilter = [], catfilter = [], idloaded = [] , ppload = 99 ){
 
                 var filter_data = {
@@ -135,18 +209,50 @@ jQuery(function($) {
                             newTagWeight( this, tagfilter );
                         });
                         console.log( result ); //$container.html( '['+data+']' );
+
+
+
+                            filterClass = '*';
+                            if( tagfilter.length > 0 ){
+                                filterClass = '.'+tagfilter.join(',.');
+                            }
+                            if( catfilter.length > 0 ){
+                                filterClass = '.'+catfilter.join(',.');
+                            }
+
+                        if( idloaded.length < 1 ){
+
+                            startIsotope( filterClass );
+
+                        }else{
+                            setIsotope( filterClass );
+                        }
+
                     }
                 });
 
 
         }
 
+        /**
+         * Markup Data Result
+         */
         function markupFilterData(result){
                 $.each( result, function(idx,obj){
                     if( $('#post-'+obj.id).length > 0 ){
                     }else{
-                        var html = '';
-                        html += '<div id="post-'+obj.id+'" class="item" data-id="'+obj.id+'" data-tags="'+obj.tags+'" data-cats="'+obj.cats+'">';
+                        var html = '', filterclass = '';
+
+                        $(obj.tags).each(function( x , tag ){
+                               filterclass += ' '+tag;
+                        });
+                        $(obj.cats).each(function( x , cats ){
+                               filterclass += ' '+cats;
+                        });
+
+                        html += '<div id="post-'+obj.id+'" data-id="'+obj.id+'" ';
+                        html += 'class="item '+filterclass+'" ';
+                        html += 'data-tags="'+obj.tags+'" data-cats="'+obj.cats+'">';
                         html += '<div>'+obj.title+'</div>';
                         html += '<div class="itemcontent">'+obj.content+'</div>';
                         html += '<div>'+obj.tags+'</div>';
@@ -158,6 +264,9 @@ jQuery(function($) {
                 });
         }
 
+        /**
+         * Get url hash vars
+         */
         function getHashUrlVars(){
                 var vars = [], hash;
                 var hashes = window.location.href.slice(window.location.href.indexOf('#') + 1).split('&');
@@ -170,7 +279,9 @@ jQuery(function($) {
                 return vars;
         }
 
-
+        /**
+         * Set new hash
+         */
             function setNewHash( tags = [], cats = [] ){
                 var newhash = '#';
                 if( tags.length > 0 ){
@@ -186,7 +297,9 @@ jQuery(function($) {
                 }
             }
 
-            // active tag menu
+           /**
+            * Tag Filter Menu
+            */
             function activeFilterMenu( tagfilter = [], catfilter = [] ){
 
                 if( $('#activefilterbox').length < 1 ){
@@ -220,7 +333,9 @@ jQuery(function($) {
             }
 
 
-            // add weight to tag relation
+            /**
+            * Item Weight Tag Filter
+            */
             function newTagWeight( obj, filter ){
 
                 var tags = $(obj).data('tags').split(',');
@@ -249,19 +364,101 @@ jQuery(function($) {
                 }else{  // restore weight to tag count vs empty filter
                     $(obj).find('.matchweight').text(tags.length);
                 }
+                /*
                 if( mc > 0 ){
                    $(obj).addClass(newSize).fadeIn();
                 }else{
                    $(obj).fadeOut();
                 }
+                */
 
+            }
+
+            function startIsotope( filterClass ){
+
+                /**
+                * Load Isotope
+                */
+
+                // init isotope
+                container.isotope({
+
+                    itemSelector: '.item',
+                    layoutMode: 'masonry',
+                    animationEngine: 'best-available',
+                    transitionDuration: '0.8s',
+                    masonry: {
+                    //isFitWidth: true,
+                    //columnWidth: '.base',
+                    gutter: 0,
+                    },
+                    getSortData: {
+                        byCategory: function (elem) { // sort randomly
+                                return $(elem).data('category') === $currCat ? 0 : 1;
+                        },
+                        byTagWeight: '.matchweight parseInt',
+                    },
+                    sortBy : 'byTagWeight', //[ 'byCategory', 'byTagWeight' ],
+                    sortAscending: {
+                              //byCategory: true, // name ascendingly
+                              byTagWeight: false, // weight descendingly
+                    },
+                });
+
+                container.isotope({ filter: filterClass }).isotope('updateSortData').isotope( 'layout' );
+
+                setColumnWidth(); // ! important to get the column width for first layout
+
+            }
+
+            function setIsotope( filterClass ){
+
+                container
+                .isotope({ filter: filterClass })
+                .isotope('updateSortData')
+                .isotope('reloadItems')
+                .isotope({
+                    sortBy : 'byTagWeight', //[ 'byCategory', 'byTagWeight' ],
+                    sortAscending: {
+                          //byCategory: true, // name ascendingly
+                          byTagWeight: false, // weight descendingly
+                    },
+                }); // 'original-order'
+                $('html, body').animate({scrollTop:0}, 400);
 
             }
 
 
-        });
+            // on resize isotope
+            var resizeId;
 
- });
+            $(window).resize(function() {
+                    clearTimeout(resizeId);
+                    resizeId = setTimeout(doneResizing, 20);
+            });
+
+            function doneResizing(){
+                setColumnWidth();
+            }
+
+            function setColumnWidth(){
+
+                var w = container.width();
+                if(w > 640) {
+                $colWidth = w/7;
+                }else{
+                $colWidth = w/3;
+                }
+                container.isotope({ masonry: { columnWidth: $colWidth } }).isotope( 'layout' );
+            }
+
+
+
+
+
+        }); // end doc loaded
+
+ }); // and jQuery $
 
 
 /** filter test 2

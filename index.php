@@ -66,6 +66,10 @@ function resource_tag_filter_menu() {
 
 	echo '<link rel="stylesheet" id="wp-startup-theme-style"  href="'.get_template_directory_uri().'/style.css" type="text/css" media="all" />';
 ?>
+<!-- older IE versions: declare css3 queries and html5 tags through js -->
+<!--[if lt IE 9]><script src="<?php echo get_template_directory_uri(); ?>/assets/html5.js"></script><script src="<?php echo get_template_directory_uri(); ?>/assets/cssmediaqueries.js"></script><![endif]-->
+<script src="<?php echo get_template_directory_uri(); ?>/assets/isotope.js" type="text/javascript" language="javascript"></script>
+<script src="<?php echo get_template_directory_uri(); ?>/assets/imagesloaded.js" type="text/javascript" language="javascript"></script>
 </head>
 <body <?php body_class(); ?>>
 
