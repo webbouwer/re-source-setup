@@ -13,7 +13,10 @@ min-height:100%;
   background: blue;*/
 }
 
-
+.hidden
+{
+display:none;
+}
 .item
 {
 width:33.33%;

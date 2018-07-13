@@ -31,24 +31,11 @@ class WPData{
         wp_localize_script( 'filter_script', 'filter_vars', array(
             'filter_nonce' => wp_create_nonce( 'filter_nonce' ), // Create nonce
             'filter_ajax_url' => admin_url( 'admin-ajax.php' ),
-            'filter_noposts'  => esc_html__('No older posts found', 're_source'),
+            'filter_alltags'  => get_terms( 'post_tag' ),
+            'filter_allcats'  => get_terms( 'post_category' ),
             )
         );
 
-    }
-
-    public function buildTagFilterMenu( $boxID = 'tagfilterbox', $butClass = 'tag-filter') {
-        $tax = 'post_tag';
-        $terms = get_terms( $tax );
-        $count = count( $terms );
-        if ( $count > 0 ):
-            echo '<div id="'.$boxID.'">';
-            foreach ( $terms as $term ) {
-                $term_link = get_term_link( $term, $tax );
-                echo '<a href="' . $term_link . '" class="'.$butClass.' ' . $term->slug . '" title="' . $term->name . '" data-slug="' . $term->slug . '">' . $term->name . '</a> ';
-            }
-            echo '</div>';
-        endif;
     }
 
     public function wp_data_multi_filter(){
@@ -86,7 +73,7 @@ class WPData{
             unset( $args['post__not_in'] );
         }
         if( !$this->ppload || $this->ppload < 1 ) {
-            $args['posts_per_page'] = 10;
+            $args['posts_per_page'] = 999;
         }
 
         // prepare response $response = $wpdata['filter_data']['tags'];
@@ -98,7 +85,7 @@ class WPData{
         while ( $query->have_posts() ) : $query->the_post();
 
             // post text
-            $excerpt_length = 15; // words
+            $excerpt_length = 120; // words
             $content = apply_filters('the_content', get_the_content());
             $excerpt = truncate( get_the_excerpt(), $excerpt_length, '', false, true );
 
