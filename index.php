@@ -34,11 +34,8 @@ require_once('functions.php');
 </head>
 <body <?php body_class(); ?>>
 
-	<div id="pagecontainer" class="site">
-
-
-    </div>
-
+    <?php $WPData->buildTagFilterMenu('filterbox', 'taglink');  // dataLoader  optional menuboxID, tagbuttonClass ?>
+	<div id="pagecontainer" class="site"></div>
 	<?php wp_footer(); ?>
 
 </body>

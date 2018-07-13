@@ -11,7 +11,6 @@ class WPData{
     $loadedID = [],
     $ppload = '';
 
-
     public function WPData() {
 
         // load settings
@@ -38,7 +37,18 @@ class WPData{
 
     }
 
-    public function wp_data_get_related_posts(){
+    public function buildTagFilterMenu( $boxID = 'tagfilterbox', $butClass = 'tag-filter') {
+        $tax = 'post_tag';
+        $terms = get_terms( $tax );
+        $count = count( $terms );
+        if ( $count > 0 ):
+            echo '<div id="'.$boxID.'">';
+            foreach ( $terms as $term ) {
+                $term_link = get_term_link( $term, $tax );
+                echo '<a href="' . $term_link . '" class="'.$butClass.' ' . $term->slug . '" title="' . $term->name . '" data-slug="' . $term->slug . '">' . $term->name . '</a> ';
+            }
+            echo '</div>';
+        endif;
     }
 
     public function wp_data_multi_filter(){
@@ -119,6 +129,7 @@ class WPData{
     }
 
 }
+
 
 /**
 * Truncates text.

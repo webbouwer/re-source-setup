@@ -33,6 +33,20 @@ a.active
 {
 color: #232323;
 }
+
+.loadbox
+{
+position: fixed;
+left:50%;
+top:10%;
+width:160px;
+margin-left:-80px;
+text-align: center;
+background-color: black;
+color: white;
+padding:4px 0px;
+}
+
 #mainmenucontainer
 {
     position: relative;
