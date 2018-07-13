@@ -5,7 +5,12 @@ $WPData = new WPData;
 class WPData{
 
     /** @obj WPstartupData */
-    public $data = [];
+    public $data = [],
+    $tagfilter = [],
+    $catfilter =[],
+    $loadedID = [],
+    $ppload = '';
+
 
     public function WPData() {
 
@@ -33,6 +38,9 @@ class WPData{
 
     }
 
+    public function wp_data_get_related_posts(){
+    }
+
     public function wp_data_multi_filter(){
 
         // Verify nonce
@@ -40,33 +48,34 @@ class WPData{
         die('Permission denied');
 
         // verify request data
-        $tagfilter = $_REQUEST['filter_data']['tagfilter'];
-        $catfilter = $_REQUEST['filter_data']['catfilter'];
-        $loadedID = $_REQUEST['filter_data']['loadedID'];
-        $ppload = $_REQUEST['filter_data']['ppload'];
+        $this->tagfilter = $_REQUEST['filter_data']['tagfilter'];
+        $this->catfilter = $_REQUEST['filter_data']['catfilter'];
+        $this->loadedID = $_REQUEST['filter_data']['loadedID'];
+        $this->ppload = $_REQUEST['filter_data']['ppload'];
 
         $args = array(
-            'tag' => $tagfilter,
-            'category_name' => $catfilter,
-            'post_type' => 'post', // 'any',  = incl pages
-            'post_status' => 'publish',
-            'post__not_in' => $loadedID,
-            'posts_offset' => $ppload,
-            'posts_per_page' => $ppload,
-            'orderby'        => 'date',
-            'order'          => 'DESC',      // 'DESC', 'ASC' or 'RAND'
+            'tag'               => json_encode($this->tagfilter),
+            'category_name'     => json_encode($this->catfilter),
+            'post_type'         => 'post', // 'any',  = incl pages
+            'post_status'       => 'publish',
+            'post__not_in'      => $this->loadedID,
+            'orderby'           => 'date',
+            'order'             => 'DESC',      // 'DESC', 'ASC' or 'RAND'
+            'posts_per_page'    => $this->ppload,
+            //'posts_offset'      => $ppload,
+            //'suppress_filters'  => false,
         );
 
-        if( !$tagfilter || $tagfilter == '') {
+        if( !$this->tagfilter || $this->tagfilter == '') {
             unset( $args['tag'] );
         }
-        if( !$catfilter || $catfilter == '') {
-            unset( $args['cats'] );
+        if( !$this->catfilter || $this->catfilter == '') {
+            unset( $args['category_name'] );
         }
-        if( !$loadedID || $loadedID == '') {
+        if( !$this->loadedID || $this->loadedID == '') {
             unset( $args['post__not_in'] );
         }
-        if( !$ppload || $ppload < 1 ) {
+        if( !$this->ppload || $this->ppload < 1 ) {
             $args['posts_per_page'] = 10;
         }
 
@@ -79,9 +88,9 @@ class WPData{
         while ( $query->have_posts() ) : $query->the_post();
 
             // post text
-            $excerpt_length = 15;
+            $excerpt_length = 15; // words
             $content = apply_filters('the_content', get_the_content());
-            $excerpt = truncate( $content, $excerpt_length, '', false, true );
+            $excerpt = truncate( get_the_excerpt(), $excerpt_length, '', false, true );
 
             $response[] = array(
                 'id' => get_the_ID(),
@@ -96,6 +105,7 @@ class WPData{
                 'author' => get_the_author(),
                 'custom_field_keys' => get_post_custom_keys()
             );
+
         endwhile;
         else:
            $response[0] = 'No posts found';

@@ -8,11 +8,12 @@ jQuery(function($) {
         var root = this;
 
         this.settings = {
-            containerID     : 'mycontainer',
-            menuboxID       : 'mymenubox',
-            itemClass       : 'myitemclass',
-            tagbuttonClass  : 'mytagclass',
-            catbuttonClass  : 'mycatclass',
+            containerID     : 'pagecontainer',
+            menuboxID       : 'datamenu',
+            searchFieldID   : 'searchbar',
+            itemClass       : 'item',
+            tagbuttonClass  : 'taglink',
+            catbuttonClass  : 'categorylink',
             postIDprefix    : 'post-'
         };
 
@@ -22,10 +23,12 @@ jQuery(function($) {
             catfilter       : [],
             prevfilter      : [],
             loadedID        : [],
-            lastResult      : [],
+            loadedData      : [],
             alltags         : [],
             allcats         : [],
-            ppload          : 2
+            ppload          : 25,
+            minload         : 50,
+            maxload         : 999
         };
 
         /**
@@ -42,14 +45,8 @@ jQuery(function($) {
          * Status
          */
         this.filterData = function(){
-
-            $('.'+root.settings.itemClass).each( function( index ){
-
-                if( $.inArray( $(this).data('id'), root.control.loadedID ) == -1 ){
-                    root.control.loadedID.push( $(this).data('id') );
-                }
-
-            });
+            // scan screen filters
+            root.control.tagfilter = ['smart','wannabee','mega'];
             console.log(root.control.loadedID);
         };
 
@@ -60,11 +57,15 @@ jQuery(function($) {
 
             root.filterData();
 
-            if( root.control.loadedID.length < 10 ){
+            if( root.control.loadedID.length < root.control.maxload ){ // max load 999 posts
+
+                if(root.control.loadedID.length < root.control.minload ){ // min load 25 posts from start
+                   root.control.ppload = root.control.minload;
+                }
 
                 var filter_data = {
-                    'tagfilter' : root.control.tagfilter.join(),
-                    'catfilter' : root.control.catfilter.join(),
+                    'tagfilter' : root.control.tagfilter,
+                    'catfilter' : root.control.catfilter,
                     'loadedID'  : root.control.loadedID,
                     'currentID' : root.control.currentID,
                     'ppload'    : root.control.ppload
@@ -83,9 +84,18 @@ jQuery(function($) {
                     },
                     success:function(result){
                         if( result[0] != 'No posts found' ){
-                            root.markupData(result);
+
+                            // collect data
+                            $.each( result, function(idx,obj){
+                                root.control.loadedID.push( obj.id );
+                                root.control.loadedData[obj.id] = obj;
+                            });
+                            root.markupHTML(result);
+                            root.sortMarkupByTagweight();
+
                         }
                     }
+
                 });
 
             }
@@ -93,14 +103,14 @@ jQuery(function($) {
         };
 
         /**
-         * Markup Data Result
+         * Markup HTML Result
          */
-        this.markupData = function(result){
+        this.markupHTML = function(result){
 
-            root.control.lastResult = result;
             var html = '';
             $.each( result, function(idx,obj){
                 if( $('[data-id='+obj.id+']').length > 0 ){
+                    // object is on screen
                 }else{
                     var filterclass = '';
                     $(obj.tags).each(function( x , tag ){
@@ -113,10 +123,13 @@ jQuery(function($) {
                     html += 'class="'+root.settings.itemClass+' '+filterclass+'" ';
                     html += 'data-tags="'+obj.tags+'" data-cats="'+obj.cats+'">';
                     html += '<div>'+obj.title+'</div>';
-                    html += '<div class="itemcontent">'+obj.content+'</div>';
+                    html += '<div class="itemcontent">';
+                    html += '<div class="intro">'+obj.excerpt+'</div>';
+                    //html += '<div class="main">'+obj.content+'</div>';
+                    html += '</div>';
                     html += '<div>'+obj.tags+'</div>';
                     html += '<div>'+obj.cats+'</div>';
-                    html += '<div class="matchweight">3</div>';
+                    html += '<div class="matchweight"></div>';
                     html += '</div>';
                 }
             });
@@ -125,30 +138,100 @@ jQuery(function($) {
 
         };
 
+        this.newTagWeight = function( obj, tagfilter ){
+
+            var tags = $(obj).data('tags').split(',');
+            var newSize = 'size-s';
+            $(obj).removeClass('size-l size-m size-s');
+            var mc = 0;
+            if( tags.length > 0  && tagfilter.length > 0){
+                for(i=0;i<tags.length;i++){
+                    //if( basefilter[tags[i]] ){
+                    if( $.inArray( tags[i], tagfilter ) > -1 ){
+                        mc++;
+                    }
+                }
+
+                $(obj).find('.matchweight').text(mc);
+
+                var percent = 100 / tagfilter.length * mc;
+                if( percent > 80 ){
+                    newSize = 'size-l';
+                }else if( percent > 40 ){
+                    newSize = 'size-m';
+                }
+
+            }else{
+
+                $(obj).find('.matchweight').text(0);
+
+            }
+
+            if( mc > 0 ){
+                $(obj).addClass(newSize).fadeIn();
+            }else{
+                $(obj).fadeOut();
+            }
+
+        };
+
+        this.sortMarkupByTagweight = function(){
+            var divs =  $('.'+root.settings.itemClass);
+            // assign tag weight
+            divs.each( function(){
+                root.newTagWeight( this, root.control.tagfilter );
+            });
+            var matchorder = divs.sort(function (a, b) {
+                return $(a).find(".matchweight").text() < $(b).find(".matchweight").text();
+            });
+            $('#'+root.settings.containerID).html(matchorder);
+
+            if( root.control.tagfilter.length > 0 ){
+				filterClass = '.'+root.control.tagfilter.join(',.');
+			}
+
+            $('#'+root.settings.containerID)
+			.isotope({ filter: filterClass })
+			.isotope('updateSortData')
+	        .isotope('reloadItems')
+	        .isotope({
+				sortBy : 'byTagWeight', //[ 'byCategory', 'byTagWeight' ],
+				sortAscending: {
+					  //byCategory: true, // name ascendingly
+					  byTagWeight: false, // weight descendingly
+				},
+			}); // 'original-order'
+
+        };
 
         this.construct(options); // load constructor
 
-    }
+    } // end Class dataLoader
+
+
+
+
 
     /**
      * Init
      */
-    var myframe = new dataLoader({
+    var frameload = new dataLoader({
             containerID     : 'pagecontainer',
             menuboxID       : 'datamenu',
+            searchFieldID   : 'searchbar',
             itemClass       : 'item',
-            tagbuttonClass  : 'mytagclass',
-            catbuttonClass  : 'mycatclass',
+            tagbuttonClass  : 'taglink',
+            catbuttonClass  : 'categorylink',
             postIDprefix    : 'post-'
     });
 
 	$(document).ready(function(){
 
         // load data
-        myframe.loadData();
+        frameload.loadData();
 
-        $('body').on('click', '.'+myframe.settings.itemClass, function(){
-            myframe.loadData();
+        $('body').on('click', '.'+frameload.settings.itemClass+',body', function(){
+            frameload.loadData();
         });
 
 	});

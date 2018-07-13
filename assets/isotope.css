@@ -11,18 +11,18 @@ min-height:100%;
 .base,
 .size-s {
   width: 14.29%;
-  min-height:150px;
+  min-height:160px;
   overflow:hidden;
 }
 .item.active{
 }
 .size-m  {
   width: 28.57%;
-  min-height:450px;
+  min-height:240px;
 }
 .size-l {
   width: 42.86%;
-  min-height:300px;
+  min-height:320px;
 }
 
 .itemcontent {
@@ -34,7 +34,7 @@ min-height:100%;
 
 .item.active {
   width: 57.1428%;
-  min-height:450px;
+  min-height:400px;
 }
 .itemcontent .intro
 {
@@ -84,15 +84,15 @@ min-height: 300px;
 .base,
 .size-s {
   width: 33.33%;
-  min-height:150px;
+  min-height:120px;
 }
 .size-m  {
   width: 66.66%;
-  min-height:450px;
+  min-height:180px;
 }
 .size-l {
   width: 100%;
-  min-height:300px;
+  min-height:240px;
 }
 
 .itemcontent {
@@ -102,34 +102,33 @@ min-height: 300px;
 
 .item.active {
   width: 100%;
-  min-height:450px;
+  min-height:480px;
 }
 }
 
 /**** Isotope CSS3 transitions ****/
 
-
-#itemcontainer,
-#itemcontainer .item {
+#pagecontainer,
+#pagecontainer .item {
    -webkit-transition: all 0.5s easeIn;
     -moz-transition: all 0.5s easeIn;
     -o-transition: all 0.5s easeIn;
     transition: all 0.5s easeIn;
 }
-#itemcontainer,
-#itemcontainer .item {
+#pagecontainer,
+#pagecontainer .item {
    -webkit-transition: all 0.5s easeIn;
     -moz-transition: all 0.5s easeIn;
     -o-transition: all 0.5s easeIn;
     transition: all 0.5s easeIn;
 }
 
-#itemcontainer {
+#pagecontainer {
   -webkit-transition-property: height, width;
      -moz-transition-property: height, width;
           transition-property: height, width;
 }
-.isotope .isotope-item {
+#pagecontainer .item {
   -webkit-transition-property: -webkit-transform, opacity;
      -moz-transition-property:    -moz-transform, opacity;
           transition-property:         transform, opacity;
