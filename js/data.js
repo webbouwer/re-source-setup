@@ -42,8 +42,8 @@ jQuery(function($) {
                     if(tagfilter.length > 0 ){
                         root.control.tagfilter = tagfilter;
                     }
-                    if( hashvars.c != '' ){
-                        root.control.selectedCat = hashvars.c;
+                    if( hashvars.pid != ''){
+                        root.control.queryID = hashvars.pid;
                     }
             }//.. catfilter
             root.setNewHash( );
@@ -166,6 +166,13 @@ jQuery(function($) {
 				$(this).clone().appendTo('#active-filters');
 			});
 			$('.item').each( function(){
+                if(root.control.queryID == $(this).data('id') ){
+                    if( $(this).data('category') != ''){
+                        root.control.selectedCat = $(this).data('category');
+                    }
+                    $(this).addClass('active');
+                    //$(this).trigger('click');
+                }
 				root.newTagWeight( this, filter );
 			});
 
@@ -232,9 +239,9 @@ jQuery(function($) {
                     },
                     byTagWeight: '.matchweight parseInt',
                 },
-                sortBy : 'byTagWeight', //[ 'byCategory', 'byTagWeight' ],
+                sortBy : [ 'byCategory', 'byTagWeight' ],
                 sortAscending: {
-                          //byCategory: true, // name ascendingly
+                          byCategory: true, // name ascendingly
                           byTagWeight: false, // weight descendingly
                 },
             })
@@ -269,8 +276,8 @@ jQuery(function($) {
             if( root.control.tagfilter.length > 0 ){
                 newhash += 'tags='+root.control.tagfilter.join();
             }
-            if(root.control.selectedCat.length > 0){
-                newhash += '&c='+root.control.selectedCat;
+            if(root.control.queryID != false && root.control.queryID != 'undefined'){
+                newhash += '&pid='+root.control.queryID;
             }
             if( root.control.catfilter.length > 0 ){
                 if(root.control.tagfilter.length > 0){
@@ -347,11 +354,12 @@ jQuery(function($) {
 
             shuffle.control.selectedCat = '';
 
+            shuffle.control.queryID = false;
+
 			shuffle.control.tagfilter = [];
 			$('#tag-filters .tagbutton.selected').each( function( index ){
 				shuffle.control.tagfilter[index] = $(this).data('tag');
 			});
-
 
 			shuffle.activeFilterMenu( shuffle.control.tagfilter );
 
@@ -401,6 +409,8 @@ jQuery(function($) {
 			$('.item').removeClass('active');
 
 			selected.addClass('active');
+
+            shuffle.control.queryID = selected.data('id');
 
             if( selected.attr('data-category') && selected.attr('data-category') != ''){
     		   shuffle.control.selectedCat = selected.attr('data-category');

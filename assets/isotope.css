@@ -39,6 +39,7 @@ min-height: 200px;
 
 .item.active {
 width:100%;
+min-height: 400px;
 background-color: red;
 }
 
