@@ -301,6 +301,7 @@ jQuery(function($) {
 				shuffle.control.tagfilter[index] = $(this).data('tag');
 			});
 
+
 			shuffle.activeFilterMenu( shuffle.control.tagfilter );
 
 			shuffle.setNewHash();
@@ -311,20 +312,19 @@ jQuery(function($) {
 			}
 
             shuffle.setColumnWidth;
-
 	  		container = $('#'+shuffle.elements.containerID);
 			container.isotope({ filter: filterClass })
-            .isotope({ masonry: { columnWidth: root.elements.columnwidth } })
-			.isotope('updateSortData')
-	        .isotope('reloadItems')
+            .isotope({ masonry: { columnWidth: shuffle.elements.columnwidth } })
+			/* if more content loaded use:
+            .isotope('updateSortData')
+	        .isotope('reloadItems') */
 	        .isotope({
 				sortBy : 'byTagWeight', //[ 'byCategory', 'byTagWeight' ],
 				sortAscending: {
 					  //byCategory: true, // name ascendingly
 					  byTagWeight: false, // weight descendingly
 				},
-			})
-            .isotope( 'layout' );
+			});
 
 	        $('html, body').animate({scrollTop:0}, 400);
 
@@ -340,6 +340,53 @@ jQuery(function($) {
 			}
 			$('#tag-filters .'+ $(this).data('tag') ).trigger('click');
 		});
+
+        // on container click (item)
+		$('body').on('click', '.item', function(event){
+
+			if (event.preventDefault) {
+				event.preventDefault();
+			} else {
+				event.returnValue = false;
+			}
+
+    		var selected = $(this);
+
+			$('.item').removeClass('active');
+			selected.addClass('active');
+
+    		//$currCat = $this.attr('data-category'); //alert($this.find('.itemcontent').text());
+
+			shuffle.control.tagfilter = selected.attr('data-tags').split(',');
+
+			shuffle.setNewHash( shuffle.control.tagfilter.join() );
+
+			shuffle.activeFilterMenu( shuffle.control.tagfilter );
+
+	      	filterClass = '*';
+			if( shuffle.control.tagfilter.length > 0 ){
+				filterClass = '.'+shuffle.control.tagfilter.join(',.');
+			}
+
+			shuffle.setColumnWidth;
+
+	  		container = $('#'+shuffle.elements.containerID);
+			container.isotope({ filter: filterClass })
+            .isotope({ masonry: { columnWidth: shuffle.elements.columnwidth } })
+			.isotope('updateSortData')
+	        .isotope('reloadItems')
+	        .isotope({
+				sortBy : 'byTagWeight', //[ 'byCategory', 'byTagWeight' ],
+				sortAscending: {
+					  //byCategory: true, // name ascendingly
+					  byTagWeight: false, // weight descendingly
+				},
+			})
+            .isotope( 'layout' );
+
+	        $('html, body').animate({scrollTop:0}, 400);
+
+  		});
 
 	});
 
