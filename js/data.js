@@ -9,6 +9,7 @@ jQuery(function($) {
             queryID         : false,
             tagfilter       : [],
             catfilter       : [],
+            selectedCat     : '',
             loadedID        : [],
             ppload          : 999
         };
@@ -29,21 +30,23 @@ jQuery(function($) {
             // set settings
             $.extend( this.control , options);
 
-            // hash tags
+            // base filter or hash tags
             var tagfilter = root.control.tagfilter;
-            if(window.location.hash) {
-                var hashvars = root.getHashUrlVars();
-                if( hashvars.tags  ){
-                    tagfilter = hashvars.tags.split(',');
-                }
-            }
-            if(tagfilter.length > 0 ){
-                root.setNewHash( tagfilter.join() );
-                root.control.tagfilter = tagfilter;
-            }
+            if(window.location.hash){
+                    var hashvars = root.getHashUrlVars();
+                    if( hashvars.tags  ){
+                        tagfilter = hashvars.tags.split(',');
+                    }
+                    if(tagfilter.length > 0 ){
+                        root.control.tagfilter = tagfilter;
+                    }
+            }//.. catfilter
+            root.setNewHash( );
 
             this.buildTagListMenu();
+
             this.getDataByFilter();
+
 
             $(window).resize(function() {
 				clearTimeout(root.resizecheck);
@@ -91,20 +94,23 @@ jQuery(function($) {
 
         this.markupHTML = function(result){
 
-            var html = '';
+            var html = '', oc = 0;
             $.each( result, function(idx,obj){
                 if( $('[data-id='+obj.id+']').length > 0 ){
                     // object is on screen
                 }else{
-                    var filterclass = '';
+                    var objfilterclasses = '';
                     $(obj.tags).each(function( x , tag ){
-                        filterclass += ' '+tag;
+                        objfilterclasses += ' '+tag;
                     });
                     $(obj.cats).each(function( x , cats ){
-                        filterclass += ' '+cats;
+                        objfilterclasses += ' '+cats;
                     });
+                    if(oc = 0){
+                        objfilterclasses += ' base';
+                    }
                     html += '<div id="post-'+obj.id+'" data-id="'+obj.id+'" ';
-                    html += 'class="'+root.elements.itemClass+' '+filterclass+'" ';
+                    html += 'class="'+root.elements.itemClass+' '+objfilterclasses+'" ';
                     html += 'data-tags="'+obj.tags+'" data-cats="'+obj.cats+'">';
                     html += '<div>'+obj.title+'</div>';
                     html += '<div class="itemcontent">';
@@ -115,10 +121,12 @@ jQuery(function($) {
                     html += '<div>'+obj.cats+'</div>';
                     html += '<div class="matchweight"></div>';
                     html += '</div>';
+                    oc++;
                 }
             });
             $('#'+root.elements.containerID).append( html );
-            root.activateIsotope();
+            root.activeFilterMenu( root.control.tagfilter );
+            root.activateIsotope(); // reload isotope completely
         };
 
         // add tag menu
@@ -197,7 +205,9 @@ jQuery(function($) {
         this.activateIsotope = function(){
 
             // init isotope
-            root.setColumnWidth;
+            var filterClass = root.getFilterClass();
+
+            root.setColumnWidth();
 
             $('#'+root.elements.containerID).isotope({
 
@@ -212,7 +222,7 @@ jQuery(function($) {
                 },
                 getSortData: {
                     /*byCategory: function (elem) { // sort randomly
-                            return $(elem).data('category') === $currCat ? 0 : 1;
+                            return $(elem).data('category') === root.control.selectedCat ? 0 : 1;
                     },*/
                     byTagWeight: '.matchweight parseInt',
                 },
@@ -222,7 +232,17 @@ jQuery(function($) {
                           byTagWeight: false, // weight descendingly
                 },
             })
-
+            .isotope({ filter: filterClass })
+            .isotope({
+				sortBy : 'byTagWeight', //[ 'byCategory', 'byTagWeight' ],
+				sortAscending: {
+					  //byCategory: true, // name ascendingly
+					  byTagWeight: false, // weight descendingly
+				},
+			});
+			/* if more content loaded use:
+            .isotope('updateSortData')
+	        .isotope('reloadItems')*/
 
         };
 
@@ -241,9 +261,12 @@ jQuery(function($) {
         this.setNewHash = function( ){
             var newhash = '#';
             if( root.control.tagfilter.length > 0 ){
-                newhash += 'tags='+root.control.tagfilter.join()+'&';
+                newhash += 'tags='+root.control.tagfilter.join();
             }
             if( root.control.catfilter.length > 0 ){
+                if(root.control.tagfilter.length > 0){
+                    newhash += '&';
+                }
                 newhash += 'cats='+root.control.catfilter.join();
             }
             if(history.pushState) {
@@ -252,6 +275,17 @@ jQuery(function($) {
                 location.hash = newhash;
             }
             console.log( JSON.stringify(root.control.tagfilter));
+        };
+
+        this.getFilterClass = function(){
+            var filterbyclass = '*';
+			if( root.control.tagfilter.length > 0 ){
+				filterbyclass = '.'+root.control.tagfilter.join(',.');
+			}
+            if( root.control.catfilter.length > 0 ){
+				filterbyclass = '.'+root.control.catfilter.join(',.');
+			}
+            return filterbyclass;
         };
 
         this.doneResizing = function(){
@@ -272,15 +306,17 @@ jQuery(function($) {
 
         };
 
-        this.construct();
+        this.construct(options);
 
     }
 
+
+
 	$(document).ready(function(){
 
-        // init dataloader
+        // setup dataloader
         var shuffle = new dataShuffle({
-            tagfilter     : [],
+            tagfilter     : ['mega','wannabee'],
             catfilter     : []
         });
 
@@ -306,25 +342,31 @@ jQuery(function($) {
 
 			shuffle.setNewHash();
 
-			filterClass = '*';
-			if( shuffle.control.tagfilter.length > 0 ){
-				filterClass = '.'+shuffle.control.tagfilter.join(',.');
-			}
+			filterClass = shuffle.getFilterClass();
 
-            shuffle.setColumnWidth;
+            shuffle.setColumnWidth();
 	  		container = $('#'+shuffle.elements.containerID);
-			container.isotope({ filter: filterClass })
+			container
             .isotope({ masonry: { columnWidth: shuffle.elements.columnwidth } })
-			/* if more content loaded use:
-            .isotope('updateSortData')
-	        .isotope('reloadItems') */
-	        .isotope({
+            .isotope({ filter: filterClass })
+            .isotope({
 				sortBy : 'byTagWeight', //[ 'byCategory', 'byTagWeight' ],
 				sortAscending: {
 					  //byCategory: true, // name ascendingly
 					  byTagWeight: false, // weight descendingly
 				},
 			});
+
+			/* if more content loaded use:
+            .isotope('updateSortData')
+	        .isotope('reloadItems')
+	        .isotope({
+				sortBy : 'byTagWeight', //[ 'byCategory', 'byTagWeight' ],
+				sortAscending: {
+					  //byCategory: true, // name ascendingly
+					  byTagWeight: false, // weight descendingly
+				},
+			}); */
 
 	        $('html, body').animate({scrollTop:0}, 400);
 
@@ -355,34 +397,30 @@ jQuery(function($) {
 			$('.item').removeClass('active');
 			selected.addClass('active');
 
-    		//$currCat = $this.attr('data-category'); //alert($this.find('.itemcontent').text());
+    		//root.control.selectedCat = $this.attr('data-category');
 
 			shuffle.control.tagfilter = selected.attr('data-tags').split(',');
 
-			shuffle.setNewHash( shuffle.control.tagfilter.join() );
-
 			shuffle.activeFilterMenu( shuffle.control.tagfilter );
 
-	      	filterClass = '*';
-			if( shuffle.control.tagfilter.length > 0 ){
-				filterClass = '.'+shuffle.control.tagfilter.join(',.');
-			}
+			shuffle.setNewHash();
 
-			shuffle.setColumnWidth;
+			filterClass = shuffle.getFilterClass();
 
+            shuffle.setColumnWidth();
 	  		container = $('#'+shuffle.elements.containerID);
-			container.isotope({ filter: filterClass })
-            .isotope({ masonry: { columnWidth: shuffle.elements.columnwidth } })
+			container
+            .prepend(selected)
 			.isotope('updateSortData')
-	        .isotope('reloadItems')
-	        .isotope({
+            .isotope({ masonry: { columnWidth: shuffle.elements.columnwidth } })
+            .isotope({ filter: filterClass })
+            .isotope({
 				sortBy : 'byTagWeight', //[ 'byCategory', 'byTagWeight' ],
 				sortAscending: {
 					  //byCategory: true, // name ascendingly
 					  byTagWeight: false, // weight descendingly
 				},
-			})
-            .isotope( 'layout' );
+			});
 
 	        $('html, body').animate({scrollTop:0}, 400);
 
