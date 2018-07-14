@@ -214,7 +214,7 @@ jQuery(function($) {
                 itemSelector: '.'+root.elements.itemClass,
                 layoutMode: 'masonry',
                 animationEngine: 'best-available',
-                transitionDuration: '0.8s',
+                transitionDuration: '0.9s',
                 masonry: {
                     //isFitWidth: true,
                     columnWidth: root.elements.columnwidth,
@@ -316,7 +316,7 @@ jQuery(function($) {
 
         // setup dataloader
         var shuffle = new dataShuffle({
-            tagfilter     : ['mega','wannabee'],
+            tagfilter     : [],
             catfilter     : []
         });
 
@@ -356,17 +356,6 @@ jQuery(function($) {
 					  byTagWeight: false, // weight descendingly
 				},
 			});
-
-			/* if more content loaded use:
-            .isotope('updateSortData')
-	        .isotope('reloadItems')
-	        .isotope({
-				sortBy : 'byTagWeight', //[ 'byCategory', 'byTagWeight' ],
-				sortAscending: {
-					  //byCategory: true, // name ascendingly
-					  byTagWeight: false, // weight descendingly
-				},
-			}); */
 
 	        $('html, body').animate({scrollTop:0}, 400);
 

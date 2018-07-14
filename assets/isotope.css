@@ -71,20 +71,6 @@ height:auto !important;
 min-height: 300px;
 }
 
-
-@media screen and (max-width: 640px) {
-.item
-{
-width:50%;
-}
-.item.active
-{
-width:100%;
-}
-
-    /*
-.item,
-.base,
 .size-s {
   width: 33.33%;
   min-height:180px;
@@ -97,6 +83,30 @@ width:100%;
   width: 100%;
   min-height:180px;
 }
+
+
+@media screen and (max-width: 640px) {
+.item
+{
+width:50%;
+}
+.item.active
+{
+width:100%;
+}
+.size-s {
+  width: 50%;
+  min-height:180px;
+}
+.size-m  {
+  width: 50%;
+  min-height:180px;
+}
+.size-l {
+  width: 100%;
+  min-height:180px;
+}
+    /*
 
 .itemcontent {
   min-width: 100%;
