@@ -1,169 +1,94 @@
-// data models
-
-
 jQuery(function($) {
 
-    var dataLoader = function(options){
+    // data models
+    var dataShuffle = function(options){
 
-        var root = this;
-
-        this.settings = {
-            containerID     : 'pagecontainer',
-            menuboxID       : 'filterbox',
-            searchFieldID   : 'searchbar',
-            itemClass       : 'item',
-            tagbuttonClass  : 'taglink',
-            catbuttonClass  : 'categorylink',
-            postIDprefix    : 'post-',
-            colWidth        : 0
-        };
+        var root = this, resizecheck;
 
         this.control = {
-            currentID       : false,
+            queryID         : false,
             tagfilter       : [],
             catfilter       : [],
-            prevfilter      : [],
             loadedID        : [],
-            loadedData      : [],
-            alltags         : [],
-            allcats         : [],
-            ppload          : 25,
-            minload         : 50,
-            maxload         : 999
+            ppload          : 999
         };
 
-        /**
-         * Constructor
-         */
+        this.elements = {
+            containerID     : 'itemcontainer',
+            itemClass       : 'item',
+            columnwidth     : 0,
+        }
+
+        this.filterdata = {
+            alltags : filter_vars.filter_alltags,
+            allcats : filter_vars.filter_allcats
+        }
+
         this.construct = function(options){
 
             // set settings
-            $.extend( this.settings , options);
+            $.extend( this.control , options);
 
-            var filter = [];
+            // hash tags
+            var tagfilter = root.control.tagfilter;
             if(window.location.hash) {
                 var hashvars = root.getHashUrlVars();
                 if( hashvars.tags  ){
-                    filter = hashvars.tags.split(',');
+                    tagfilter = hashvars.tags.split(',');
                 }
             }
-            root.setNewHash( filter.join() );
-            if(filter.length > 0 ){
-                root.control.tagfilter = filter;
+            if(tagfilter.length > 0 ){
+                root.setNewHash( tagfilter.join() );
+                root.control.tagfilter = tagfilter;
             }
 
-            var el = '#'+root.settings.menuboxID+' .'+root.settings.tagbuttonClass;
-            $(el).each( function(){
-				$(this).removeClass('selected');
-				if( $.inArray( $(this).data('slug') , root.control.tagfilter ) > -1 ){
-					$(this).addClass('selected');
-				}
-			});
+            this.buildTagListMenu();
+            this.getDataByFilter();
 
-            $('#'+root.settings.containerID).isotope({
-
-                itemSelector: '.'+root.settings.itemClass,
-                layoutMode: 'masonry',
-                animationEngine: 'best-available',
-                transitionDuration: '0.5s',
-                masonry: {
-                //isFitWidth: true,
-                //columnWidth: '.base',
-                gutter: 0,
-                },
-                getSortData: {
-                    /*byCategory: function (elem) { // sort randomly
-                            return $(elem).data('category') === $currCat ? 0 : 1;
-                    },*/
-                    byTagWeight: '.matchweight parseInt',
-                },
-                sortBy : 'byTagWeight', //[ 'byCategory', 'byTagWeight' ],
-                sortAscending: {
-                          //byCategory: true, // name ascendingly
-                          byTagWeight: false, // weight descendingly
-                },
-
+            $(window).resize(function() {
+				clearTimeout(root.resizecheck);
+				root.resizecheck = setTimeout( root.doneResizing, 20);
             });
-            root.setColumnWidth();
 
         };
 
-        /**
-         * Status
-         */
-        this.filterData = function(){
-
-            //root.control.tagfilter = ['smart','wannabee','mega'];
-            if( $('#active-filters').length < 1 ){
-				$('body').prepend('<div id="active-filters"></div>');
-			}
-			var el = '#'+frameload.settings.menuboxID+' .'+frameload.settings.tagbuttonClass;
-
-			$('#active-filters').html('');
-			$(el+'.selected').each( function(){
-				$(this).clone().appendTo('#active-filters');
-			});
-
-            console.log(root.control.tagfilter);
-            //console.log(root.control.loadedID);
-        };
-
-        /**
-         * On active Filter
-         */
-        this.loadData = function(){
-
-            root.filterData();
-
-            if( root.control.loadedID.length < root.control.maxload ){ // max load 999 posts
-
-                if(root.control.loadedID.length < root.control.minload ){ // min load 25 posts from start
-                   root.control.ppload = root.control.minload;
-                }
-
-                var filter_data = {
-                    'tagfilter' : root.control.tagfilter,
-                    'catfilter' : root.control.catfilter,
-                    'loadedID'  : root.control.loadedID,
-                    'currentID' : root.control.currentID,
-                    'ppload'    : root.control.ppload
-                };
-
-                $.ajax({
-                    url: filter_vars.filter_ajax_url,
-                    data:{
-                        'action': 'multi_filter', // function to execute
-                        'filter_nonce': filter_vars.filter_nonce, // wp_nonce
-                        'filter_data': filter_data, // selected data filters
-                    }, // form data
-                    dataType: 'json',
-                    type: 'POST', // POST
-                    beforeSend:function(xhr){
-                    },
-                    success:function(result){
-
-                        if( result[0] != 'No posts found' ){
-
-                            // collect data
-                            $.each( result, function(idx,obj){
-                                root.control.loadedID.push( obj.id );
-                                root.control.loadedData[obj.id] = obj;
-                            });
-
-                            root.markupHTML(result);
-                        }
-                        root.sortMarkupByTagweight();
-                    }
-
-                });
-
+        this.toggleLoadBox = function(){
+            if( $('.loadbox').length < 1 ){
+                $('body').append('<div class="loadbox">loading..</div>');
+            }else{
+                $('.loadbox').remove();
             }
-
         };
 
-        /**
-         * Markup HTML Result
-         */
+        this.getDataByFilter = function(){
+
+            var filter_data = [];
+
+            $.ajax({
+                url: filter_vars.filter_ajax_url,
+                data:{
+                    'action': 'multi_filter', // function to execute
+                    'filter_nonce': filter_vars.filter_nonce, // wp_nonce
+                    'filter_data': filter_data, // selected data filters
+                }, // form data
+                dataType: 'json',
+                type: 'POST', // POST
+                beforeSend:function(xhr){
+                    root.toggleLoadBox();
+                },
+                success:function(result){
+                    // Display posts on page
+                    if( result[0] != 'No posts found' ){
+                        $.each( result, function(idx,obj){
+                            root.control.loadedID.push( obj.id );
+                        });
+                        root.markupHTML(result);
+                    }
+                    root.toggleLoadBox();
+                }
+            });
+        };
+
         this.markupHTML = function(result){
 
             var html = '';
@@ -178,8 +103,8 @@ jQuery(function($) {
                     $(obj.cats).each(function( x , cats ){
                         filterclass += ' '+cats;
                     });
-                    html += '<div id="'+root.settings.postIDprefix+''+obj.id+'" data-id="'+obj.id+'" ';
-                    html += 'class="'+root.settings.itemClass+' '+filterclass+'" ';
+                    html += '<div id="post-'+obj.id+'" data-id="'+obj.id+'" ';
+                    html += 'class="'+root.elements.itemClass+' '+filterclass+'" ';
                     html += 'data-tags="'+obj.tags+'" data-cats="'+obj.cats+'">';
                     html += '<div>'+obj.title+'</div>';
                     html += '<div class="itemcontent">';
@@ -192,11 +117,45 @@ jQuery(function($) {
                     html += '</div>';
                 }
             });
-            $('#'+root.settings.containerID).append( html );
-
-            //console.log(JSON.stringify(root));
-
+            $('#'+root.elements.containerID).append( html );
+            root.activateIsotope();
         };
+
+        // add tag menu
+		this.buildTagListMenu = function(){
+
+            var tags = root.filterdata.alltags;
+			var tagmenu = '<div id="tag-filters">';
+			for(i=0;i<tags.length;i++){
+				tagmenu += '<a href="#tags='+tags[i]['slug']+'" class="tagbutton '+tags[i]['slug']+'" data-tag="'+tags[i]['slug']+'">'+tags[i]['name']+'</a>';
+			}
+			tagmenu += '</div>';
+			$('body').prepend(tagmenu);
+		};
+
+		// active tag menu
+		this.activeFilterMenu = function( filter ){
+
+			if( $('#active-filters').length < 1 ){
+				$('body').prepend('<div id="active-filters"></div>');
+			}
+
+			$('#tag-filters .tagbutton').each( function(){
+				$(this).removeClass('selected');
+				if( $.inArray( $(this).data('tag') , filter ) > -1 ){
+					$(this).addClass('selected');
+				}
+			});
+			$('#active-filters').html('');
+			$('#tag-filters .tagbutton.selected').each( function(){
+				$(this).clone().appendTo('#active-filters');
+			});
+			$('.item').each( function(){
+				$(this).removeClass('active');
+				root.newTagWeight( this, filter );
+			});
+
+		};
 
         this.newTagWeight = function( obj, tagfilter ){
 
@@ -226,49 +185,44 @@ jQuery(function($) {
                 $(obj).find('.matchweight').text(0);
 
             }
-
             if( mc > 0 ){
                 $(obj).addClass(newSize);//.fadeIn();
             }else{
-                $(obj).hide();
+                //$(obj).hide();
             }
 
         };
 
-        this.sortMarkupByTagweight = function(){
 
-            var divs =  $('.'+root.settings.itemClass);
-            // assign tag weight
-            divs.each( function(){
-                root.newTagWeight( this, root.control.tagfilter );
-            });
-            var matchorder = divs.sort(function (a, b) {
-                return $(a).find(".matchweight").text() < $(b).find(".matchweight").text();
-            });
-            $('#'+root.settings.containerID).html(matchorder);
+        this.activateIsotope = function(){
 
+            // init isotope
+            root.setColumnWidth;
 
-            if( root.control.tagfilter.length > 0 ){
-				var filterClass = '.'+root.control.tagfilter.join(',.');
-			}
+            $('#'+root.elements.containerID).isotope({
 
+                itemSelector: '.'+root.elements.itemClass,
+                layoutMode: 'masonry',
+                animationEngine: 'best-available',
+                transitionDuration: '0.8s',
+                masonry: {
+                    //isFitWidth: true,
+                    columnWidth: root.elements.columnwidth,
+                    gutter: 0,
+                },
+                getSortData: {
+                    /*byCategory: function (elem) { // sort randomly
+                            return $(elem).data('category') === $currCat ? 0 : 1;
+                    },*/
+                    byTagWeight: '.matchweight parseInt',
+                },
+                sortBy : 'byTagWeight', //[ 'byCategory', 'byTagWeight' ],
+                sortAscending: {
+                          //byCategory: true, // name ascendingly
+                          byTagWeight: false, // weight descendingly
+                },
+            })
 
-			$('.'+root.settings.itemClass+'.proposed').addClass('active').removeClass('proposed');
-
-            $('#'+root.settings.containerID)
-			.isotope({ filter: filterClass })
-			.isotope('updateSortData')
-	        .isotope('reloadItems')
-	        .isotope({
-				sortBy : 'byTagWeight', //[ 'byCategory', 'byTagWeight' ],
-				sortAscending: {
-					  //byCategory: true, // name ascendingly
-					  byTagWeight: false, // weight descendingly
-				},
-			}); // 'original-order'
-
-
-            root.setColumnWidth();
 
         };
 
@@ -284,108 +238,53 @@ jQuery(function($) {
             return vars;
         }
 
-        this.setNewHash = function(){
-
+        this.setNewHash = function( ){
             var newhash = '#';
             if( root.control.tagfilter.length > 0 ){
-                newhash += 'tags='+root.control.tagfilter+'&';
+                newhash += 'tags='+root.control.tagfilter.join()+'&';
             }
             if( root.control.catfilter.length > 0 ){
-                newhash += 'cats='+root.control.catfilter;
+                newhash += 'cats='+root.control.catfilter.join();
             }
             if(history.pushState) {
                 history.pushState(null, null, newhash );
             }else{
                 location.hash = newhash;
             }
+            console.log( JSON.stringify(root.control.tagfilter));
         };
 
         this.doneResizing = function(){
+
 			root.setColumnWidth();
+			$('#'+root.elements.containerID).isotope({ masonry: { columnWidth: root.elements.columnwidth } }).isotope( 'layout' );
+
 		};
 
 		this.setColumnWidth = function(){
 
-			var w = $('#'+root.settings.containerID).width();
+			var w = $('#'+root.elements.containerID).width();
 			if(w > 640) {
-			root.control.colWidth = w/3;
+			root.elements.columnwidth = w/3;
 			}else{
-			root.control.colWidth = w/2;
+			root.elements.columnwidth = w/2;
 			}
-			$('#'+root.settings.containerID).isotope({ masonry: { columnWidth: root.control.colWidth } }).isotope( 'layout' );
-		};
 
+        };
 
+        this.construct();
 
-        this.construct(options); // load constructor
-
-    } // end Class dataLoader
-
-
-
-
-
-    /**
-     * Init
-     */
-    var frameload = new dataLoader({
-            containerID     : 'pagecontainer',
-            menuboxID       : 'filterbox',
-            searchFieldID   : 'searchbar',
-            itemClass       : 'item',
-            tagbuttonClass  : 'taglink',
-            catbuttonClass  : 'categorylink',
-            postIDprefix    : 'post-'
-    });
+    }
 
 	$(document).ready(function(){
 
-        var resizeId;
-		$(window).resize(function() {
-				clearTimeout(resizeId);
-				resizeId = setTimeout( frameload.doneResizing, 20);
-		});
-
-        // load data
-        frameload.loadData();
-
-        var el = '#'+frameload.settings.menuboxID+' .'+frameload.settings.tagbuttonClass;
-
-        $('body').on( 'click', el, function(event){
-            if (event.preventDefault) {
-				event.preventDefault();
-			} else {
-				event.returnValue = false;
-			}
-            $(this).toggleClass('selected');
-
-            frameload.control.tagfilter = [];
-
-            $('.'+frameload.settings.itemClass).removeClass('active');
-
-            $(el+'.selected').each( function( index ){
-				frameload.control.tagfilter[index] = $(this).data('slug');
-			});
-
-            frameload.loadData();
-
-            frameload.setNewHash( frameload.control.tagfilter );
-            //alert( $(this).data('slug') );
+        // init dataloader
+        var shuffle = new dataShuffle({
+            tagfilter     : [],
+            catfilter     : []
         });
 
-        // on active filter click (tag)
-        var el2 = '#active-filters .'+frameload.settings.tagbuttonClass;
-
-		$('body').on( 'click', el2, function(event){
-			if (event.preventDefault) {
-				event.preventDefault();
-			} else {
-				event.returnValue = false;
-			}
-			$('#'+frameload.settings.menuboxID+' .'+ $(this).data('slug') ).trigger('click');
-		});
-
-        $('body').on('click', '.'+frameload.settings.itemClass, function(event){
+        $('body').on( 'click', '#tag-filters .tagbutton', function(event){
 
 			if (event.preventDefault) {
 				event.preventDefault();
@@ -394,31 +293,53 @@ jQuery(function($) {
 			}
 
     		var $this = $(this);
+			var tag  = $this.attr('data-tag');
+			$this.toggleClass('selected');
 
-            $('.'+frameload.settings.itemClass).removeClass('active');
-
-			$this.addClass('proposed');
-    		//$currCat = $this.attr('data-category'); //alert($this.find('.itemcontent').text());
-
-            frameload.control.tagfilter = $this.data('tags').split(',');;
-			frameload.control.catfilter = $this.data('cats').split(',');
-
-            $('#tag-filters .tagbutton').each( function( index ){
-                $(this).removeClass('selected');
-                if( $.inArray( $(this).data('slug'), frameload.control.tagfilter ) > -1 ){
-                    $(this).addClass('selected');
-                }
+			shuffle.control.tagfilter = [];
+			$('#tag-filters .tagbutton.selected').each( function( index ){
+				shuffle.control.tagfilter[index] = $(this).data('tag');
 			});
 
-            frameload.loadData();
+			shuffle.activeFilterMenu( shuffle.control.tagfilter );
 
+			shuffle.setNewHash();
 
-            frameload.setNewHash();
+			filterClass = '*';
+			if( shuffle.control.tagfilter.length > 0 ){
+				filterClass = '.'+shuffle.control.tagfilter.join(',.');
+			}
+
+            shuffle.setColumnWidth;
+
+	  		container = $('#'+shuffle.elements.containerID);
+			container.isotope({ filter: filterClass })
+            .isotope({ masonry: { columnWidth: root.elements.columnwidth } })
+			.isotope('updateSortData')
+	        .isotope('reloadItems')
+	        .isotope({
+				sortBy : 'byTagWeight', //[ 'byCategory', 'byTagWeight' ],
+				sortAscending: {
+					  //byCategory: true, // name ascendingly
+					  byTagWeight: false, // weight descendingly
+				},
+			})
+            .isotope( 'layout' );
 
 	        $('html, body').animate({scrollTop:0}, 400);
 
   		});
 
+
+		// on active filter click (tag)
+		$('body').on( 'click', '#active-filters .tagbutton', function(event){
+			if (event.preventDefault) {
+				event.preventDefault();
+			} else {
+				event.returnValue = false;
+			}
+			$('#tag-filters .'+ $(this).data('tag') ).trigger('click');
+		});
 
 	});
 
@@ -426,13 +347,11 @@ jQuery(function($) {
     });
 
     $(document).ajaxStart(function() {
-        $('body').append('<div class="loadbox">loading..</div>');
     });
 
     $(document).ajaxComplete(function() { // http://api.jquery.com/ajaxstop/
-        $('.loadbox').remove();
-    });
 
+    });
 
 });
 
