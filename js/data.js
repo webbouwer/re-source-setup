@@ -32,6 +32,8 @@ jQuery(function($) {
 
             // base filter or hash tags
             var tagfilter = root.control.tagfilter;
+            var catfilter = root.control.catfilter;
+            var selectedCat = root.control.selectedCat;
             if(window.location.hash){
                     var hashvars = root.getHashUrlVars();
                     if( hashvars.tags  ){
@@ -39,6 +41,9 @@ jQuery(function($) {
                     }
                     if(tagfilter.length > 0 ){
                         root.control.tagfilter = tagfilter;
+                    }
+                    if( hashvars.c != '' ){
+                        root.control.selectedCat = hashvars.c;
                     }
             }//.. catfilter
             root.setNewHash( );
@@ -106,12 +111,13 @@ jQuery(function($) {
                     $(obj.cats).each(function( x , cats ){
                         objfilterclasses += ' '+cats;
                     });
-                    if(oc = 0){
+                    var catreverse = obj.cats.reverse();
+                    /*if(oc = 0){
                         objfilterclasses += ' base';
-                    }
+                    }*/
                     html += '<div id="post-'+obj.id+'" data-id="'+obj.id+'" ';
                     html += 'class="'+root.elements.itemClass+' '+objfilterclasses+'" ';
-                    html += 'data-tags="'+obj.tags+'" data-cats="'+obj.cats+'">';
+                    html += 'data-tags="'+obj.tags+'" data-cats="'+obj.cats+'" data-category="'+catreverse[0]+'">';
                     html += '<div>'+obj.title+'</div>';
                     html += '<div class="itemcontent">';
                     html += '<div class="intro">'+obj.excerpt+'</div>';
@@ -125,6 +131,7 @@ jQuery(function($) {
                 }
             });
             $('#'+root.elements.containerID).append( html );
+
             root.activeFilterMenu( root.control.tagfilter );
             root.activateIsotope(); // reload isotope completely
         };
@@ -159,7 +166,6 @@ jQuery(function($) {
 				$(this).clone().appendTo('#active-filters');
 			});
 			$('.item').each( function(){
-				$(this).removeClass('active');
 				root.newTagWeight( this, filter );
 			});
 
@@ -221,9 +227,9 @@ jQuery(function($) {
                     gutter: 0,
                 },
                 getSortData: {
-                    /*byCategory: function (elem) { // sort randomly
+                    byCategory: function (elem) { // sort randomly
                             return $(elem).data('category') === root.control.selectedCat ? 0 : 1;
-                    },*/
+                    },
                     byTagWeight: '.matchweight parseInt',
                 },
                 sortBy : 'byTagWeight', //[ 'byCategory', 'byTagWeight' ],
@@ -234,9 +240,9 @@ jQuery(function($) {
             })
             .isotope({ filter: filterClass })
             .isotope({
-				sortBy : 'byTagWeight', //[ 'byCategory', 'byTagWeight' ],
+				sortBy : [ 'byCategory', 'byTagWeight' ], // 'byTagWeight', //
 				sortAscending: {
-					  //byCategory: true, // name ascendingly
+					  byCategory: true, // name ascendingly
 					  byTagWeight: false, // weight descendingly
 				},
 			});
@@ -263,6 +269,9 @@ jQuery(function($) {
             if( root.control.tagfilter.length > 0 ){
                 newhash += 'tags='+root.control.tagfilter.join();
             }
+            if(root.control.selectedCat.length > 0){
+                newhash += '&c='+root.control.selectedCat;
+            }
             if( root.control.catfilter.length > 0 ){
                 if(root.control.tagfilter.length > 0){
                     newhash += '&';
@@ -274,7 +283,8 @@ jQuery(function($) {
             }else{
                 location.hash = newhash;
             }
-            console.log( JSON.stringify(root.control.tagfilter));
+            //root.control.selectedCat = $this.attr('data-category');
+            console.log( JSON.stringify(root.control.selectedCat));
         };
 
         this.getFilterClass = function(){
@@ -330,7 +340,12 @@ jQuery(function($) {
 
     		var $this = $(this);
 			var tag  = $this.attr('data-tag');
+
+            $('.item').removeClass('active');
+
 			$this.toggleClass('selected');
+
+            shuffle.control.selectedCat = '';
 
 			shuffle.control.tagfilter = [];
 			$('#tag-filters .tagbutton.selected').each( function( index ){
@@ -384,9 +399,12 @@ jQuery(function($) {
     		var selected = $(this);
 
 			$('.item').removeClass('active');
+
 			selected.addClass('active');
 
-    		//root.control.selectedCat = $this.attr('data-category');
+            if( selected.attr('data-category') && selected.attr('data-category') != ''){
+    		   shuffle.control.selectedCat = selected.attr('data-category');
+            }
 
 			shuffle.control.tagfilter = selected.attr('data-tags').split(',');
 
@@ -398,15 +416,15 @@ jQuery(function($) {
 
             shuffle.setColumnWidth();
 	  		container = $('#'+shuffle.elements.containerID);
+			container.prepend(selected);
 			container
-            .prepend(selected)
-			.isotope('updateSortData')
+            .isotope('updateSortData')
             .isotope({ masonry: { columnWidth: shuffle.elements.columnwidth } })
             .isotope({ filter: filterClass })
             .isotope({
-				sortBy : 'byTagWeight', //[ 'byCategory', 'byTagWeight' ],
+				sortBy : [ 'byCategory', 'byTagWeight' ], // 'byTagWeight', //
 				sortAscending: {
-					  //byCategory: true, // name ascendingly
+					  byCategory: true, // name ascendingly
 					  byTagWeight: false, // weight descendingly
 				},
 			});

@@ -23,6 +23,19 @@ width:33.33%;
 background-color: blue;
 min-height: 200px;
 }
+/*
+.size-m {
+  width: 33.33%;
+  min-height:180px;
+}
+.size-l  {
+  width: 66.66%;
+  min-height:180px;
+}
+.size-l {
+  width: 100%;
+  min-height:180px;
+}*/
 
 .item.active {
 width:100%;
@@ -69,19 +82,6 @@ height:auto !important;
 max-width:100% !important;
 height:auto !important;
 min-height: 300px;
-}
-
-.size-s {
-  width: 33.33%;
-  min-height:180px;
-}
-.size-m  {
-  width: 66.66%;
-  min-height:180px;
-}
-.size-l {
-  width: 100%;
-  min-height:180px;
 }
 
 
