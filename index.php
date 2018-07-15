@@ -40,6 +40,10 @@ require_once('functions.php');
         <div id="itemcontainer" class="isotope">
         </div>
 
+
+        <div id="postcontainer" class="isotope">
+        </div>
+
     </div>
 
 	<?php wp_footer(); ?>

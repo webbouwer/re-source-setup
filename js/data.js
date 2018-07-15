@@ -21,14 +21,17 @@ jQuery(function($) {
         }
 
         this.filterdata = {
-            alltags : filter_vars.filter_alltags,
-            allcats : filter_vars.filter_allcats
+            alltags         : filter_vars.filter_alltags,
+            allcats         : filter_vars.filter_allcats,
+            prevtagfilter    : [],
+            prevcatfilter      : [],
         }
 
-        this.construct = function(options){
+        this.construct = function(ctrl,el){
 
             // set settings
-            $.extend( this.control , options);
+            $.extend( this.control , ctrl);
+            $.extend( this.elements , el);
 
             // base filter or hash tags
             var tagfilter = root.control.tagfilter;
@@ -39,10 +42,16 @@ jQuery(function($) {
                     if( hashvars.tags  ){
                         tagfilter = hashvars.tags.split(',');
                     }
+                    if( hashvars.cats  ){
+                        catfilter = hashvars.cats.split(',');
+                    }
                     if(tagfilter.length > 0 ){
                         root.control.tagfilter = tagfilter;
                     }
-                    if( hashvars.pid != ''){
+                    if(catfilter.length > 0 ){
+                        //root.control.catfilter = catfilter;
+                    }
+                    if( hashvars.pid != '' && hashvars.pid != 'undefined'){
                         root.control.queryID = hashvars.pid;
                     }
             }//.. catfilter
@@ -118,10 +127,18 @@ jQuery(function($) {
                     html += '<div id="post-'+obj.id+'" data-id="'+obj.id+'" ';
                     html += 'class="'+root.elements.itemClass+' '+objfilterclasses+'" ';
                     html += 'data-tags="'+obj.tags+'" data-cats="'+obj.cats+'" data-category="'+catreverse[0]+'">';
-                    html += '<div>'+obj.title+'</div>';
                     html += '<div class="itemcontent">';
-                    html += '<div class="intro">'+obj.excerpt+'</div>';
-                    //html += '<div class="main">'+obj.content+'</div>';
+
+                    html += '<div class="intro">';
+                    if(obj.image && obj.image != ''){
+                    html += obj.image;
+                    }
+                    html += '<h3>'+obj.title+'</h3>';
+                    html += '<div class="excerpt">'+obj.excerpt+'</div>';
+                    html += '</div>';
+
+                    html += '<div class="main">'+obj.content+'</div>';
+
                     html += '</div>';
                     html += '<div>'+obj.tags+'</div>';
                     html += '<div>'+obj.cats+'</div>';
@@ -133,7 +150,9 @@ jQuery(function($) {
             $('#'+root.elements.containerID).append( html );
 
             root.activeFilterMenu( root.control.tagfilter );
-            root.activateIsotope(); // reload isotope completely
+            $('body').imagesLoaded( function(){
+                root.activateIsotope(); // reload isotope completely
+            });
         };
 
         // add tag menu
@@ -279,28 +298,31 @@ jQuery(function($) {
             if(root.control.queryID != false && root.control.queryID != 'undefined'){
                 newhash += '&pid='+root.control.queryID;
             }
-            if( root.control.catfilter.length > 0 ){
+            /*if( root.control.catfilter.length > 0 ){
                 if(root.control.tagfilter.length > 0){
                     newhash += '&';
                 }
                 newhash += 'cats='+root.control.catfilter.join();
-            }
+            }*/
             if(history.pushState) {
                 history.pushState(null, null, newhash );
             }else{
                 location.hash = newhash;
             }
             //root.control.selectedCat = $this.attr('data-category');
-            console.log( JSON.stringify(root.control.selectedCat));
+            //console.log( JSON.stringify(root.control.selectedCat));
         };
+
+
 
         this.getFilterClass = function(){
             var filterbyclass = '*';
+
 			if( root.control.tagfilter.length > 0 ){
 				filterbyclass = '.'+root.control.tagfilter.join(',.');
 			}
             if( root.control.catfilter.length > 0 ){
-				filterbyclass = '.'+root.control.catfilter.join(',.');
+				//filterbyclass = '.'+root.control.catfilter.join(',.');
 			}
             return filterbyclass;
         };
@@ -323,20 +345,6 @@ jQuery(function($) {
 
         };
 
-        this.construct(options);
-
-    }
-
-
-
-	$(document).ready(function(){
-
-        // setup dataloader
-        var shuffle = new dataShuffle({
-            tagfilter     : [],
-            catfilter     : []
-        });
-
         $('body').on( 'click', '#tag-filters .tagbutton', function(event){
 
 			if (event.preventDefault) {
@@ -346,39 +354,61 @@ jQuery(function($) {
 			}
 
     		var $this = $(this);
+
 			var tag  = $this.attr('data-tag');
 
             $('.item').removeClass('active');
 
 			$this.toggleClass('selected');
 
-            shuffle.control.selectedCat = '';
+            root.control.selectedCat = '';
 
-            shuffle.control.queryID = false;
+            root.control.queryID = false;
 
-			shuffle.control.tagfilter = [];
+			root.control.tagfilter = [];
 			$('#tag-filters .tagbutton.selected').each( function( index ){
-				shuffle.control.tagfilter[index] = $(this).data('tag');
+				root.control.tagfilter[index] = $(this).data('tag');
 			});
 
-			shuffle.activeFilterMenu( shuffle.control.tagfilter );
+			root.activeFilterMenu( root.control.tagfilter );
 
-			shuffle.setNewHash();
+			root.setNewHash();
 
-			filterClass = shuffle.getFilterClass();
+			var filterClass = root.getFilterClass();
 
-            shuffle.setColumnWidth();
-	  		container = $('#'+shuffle.elements.containerID);
-			container
-            .isotope({ masonry: { columnWidth: shuffle.elements.columnwidth } })
-            .isotope({ filter: filterClass })
-            .isotope({
-				sortBy : 'byTagWeight', //[ 'byCategory', 'byTagWeight' ],
-				sortAscending: {
-					  //byCategory: true, // name ascendingly
-					  byTagWeight: false, // weight descendingly
-				},
-			});
+            root.setColumnWidth();
+
+	  		var container = $('#'+root.elements.containerID);
+
+            if(filterClass == '*'){
+
+                //root.activateIsotope(); // reload isotope completely
+                container
+                //.isotope('updateSortData')
+                .isotope({ filter: filterClass })
+                .isotope({
+                    sortBy : 'byTagWeight', //[ 'byCategory', 'byTagWeight' ],
+                    sortAscending: {
+                          //byCategory: true, // name ascendingly
+                          byTagWeight: false, // weight descendingly
+                    },
+                });
+
+            }else{
+
+                container
+                .isotope({ filter: filterClass })
+                .isotope({
+                    sortBy : 'byTagWeight', //[ 'byCategory', 'byTagWeight' ],
+                    sortAscending: {
+                          //byCategory: true, // name ascendingly
+                          byTagWeight: false, // weight descendingly
+                    },
+                });
+            }
+
+            container.isotope({ masonry: { columnWidth: root.elements.columnwidth } }).isotope( 'layout' );
+
 
 	        $('html, body').animate({scrollTop:0}, 400);
 
@@ -406,30 +436,47 @@ jQuery(function($) {
 
     		var selected = $(this);
 
-			$('.item').removeClass('active');
+            if( selected.hasClass('active') ){
 
-			selected.addClass('active');
+                $('.item').removeClass('active');
 
-            shuffle.control.queryID = selected.data('id');
+                root.control.tagfilter = root.filterdata.prevtagfilter;
+                root.control.catfilter = root.filterdata.prevcatfilter;
+                root.control.queryID = false;
+                root.control.selectedCat = false;
 
-            if( selected.attr('data-category') && selected.attr('data-category') != ''){
-    		   shuffle.control.selectedCat = selected.attr('data-category');
+            }else{
+
+                root.filterdata.prevtagfilter = root.control.tagfilter;
+                root.filterdata.prevcatfilter = root.control.catfilter;
+
+                $('.item').removeClass('active');
+                selected.addClass('active');
+
+                root.control.queryID = selected.data('id');
+
+                if( selected.attr('data-category') && selected.attr('data-category') != ''){
+                   root.control.selectedCat = selected.attr('data-category');
+                }
+
+                root.control.tagfilter = selected.attr('data-tags').split(',');
+
+                //root.control.catfilter = selected.attr('data-cats').split(',');
+
             }
 
-			shuffle.control.tagfilter = selected.attr('data-tags').split(',');
+			root.activeFilterMenu( root.control.tagfilter );
 
-			shuffle.activeFilterMenu( shuffle.control.tagfilter );
+			root.setNewHash();
 
-			shuffle.setNewHash();
+			filterClass = root.getFilterClass();
 
-			filterClass = shuffle.getFilterClass();
-
-            shuffle.setColumnWidth();
-	  		container = $('#'+shuffle.elements.containerID);
+            root.setColumnWidth();
+	  		var container = $('#'+root.elements.containerID);
 			container.prepend(selected);
 			container
             .isotope('updateSortData')
-            .isotope({ masonry: { columnWidth: shuffle.elements.columnwidth } })
+            .isotope({ masonry: { columnWidth: root.elements.columnwidth } })
             .isotope({ filter: filterClass })
             .isotope({
 				sortBy : [ 'byCategory', 'byTagWeight' ], // 'byTagWeight', //
@@ -442,6 +489,26 @@ jQuery(function($) {
 	        $('html, body').animate({scrollTop:0}, 400);
 
   		});
+
+        this.construct(options);
+
+    }
+
+
+
+	$(document).ready(function(){
+
+        // setup dataloader
+        var shuffle = new dataShuffle({
+            tagfilter     : [],
+            catfilter     : []
+        },{
+            containerID     : 'itemcontainer',
+            itemClass       : 'item',
+        });
+
+
+
 
 	});
 

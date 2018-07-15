@@ -19,9 +19,15 @@ require get_template_directory() . '/data.php'; // view functions
      unregister_widget('WP_Widget_Recent_Comments');
      unregister_widget('WP_Widget_RSS');
      unregister_widget('WP_Widget_Tag_Cloud');
-     unregister_widget('WP_Nav_Menu_Widget');
+     //unregister_widget('WP_Nav_Menu_Widget');
  }
  add_action('widgets_init', 'remove_default_widgets', 11);
+
+// register options
+function theme_post_thumbnails() {
+    add_theme_support( 'post-thumbnails' );
+}
+add_action( 'after_setup_theme', 'theme_post_thumbnails' );
 
 /*
  * Register widgets
