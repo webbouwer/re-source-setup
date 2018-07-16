@@ -44,8 +44,8 @@ float:left;
 #itemcontainer,
 .shuffleContainer
 {
-min-width:480px;
-width:auto;
+width:60%;
+    float:left;
 }
 .shuffleMenu
 {

@@ -44,8 +44,6 @@ jQuery(function($) {
             $.extend( root.control , options[0]);
             $.extend( root.elements , options[1]);
 
-            console.log(options[1].itemClass);
-
             // base filter or hash tags
             var tagfilter = root.control.tagfilter;
             var catfilter = root.control.catfilter;
@@ -65,17 +63,16 @@ jQuery(function($) {
                     if(catfilter.length > 0 ){
                         //root.control.catfilter = catfilter;
                     }
-                    if( hashvars.pid != '' && hashvars.pid != typeof undefined){
+                    if( hashvars.pid && hashvars.pid != '' && hashvars.pid != 'undefined' && hashvars.pid != typeof undefined){
                         root.control.queryID = hashvars.pid;
                     }
 
             }//.. catfilter
             root.setNewHash( );
 
-            this.buildTagListMenu();
+            root.buildTagListMenu();
 
-            this.getDataByFilter();
-
+            root.getDataByFilter();
 
             $(window).resize(function() {
 				clearTimeout(root.resizecheck);
@@ -170,9 +167,12 @@ jQuery(function($) {
             $('#'+root.elements.containerID).append( html );
 
             root.activeFilterMenu( root.control.tagfilter );
-            $('body').imagesLoaded( function(){
-                root.toggleLoadBox();
-                root.activateIsotope(); // reload isotope completely
+
+            $('#'+root.elements.containerID).imagesLoaded( function(){
+
+                    root.toggleLoadBox();
+                    root.activateIsotope(); // reload isotope completely
+
             });
         };
 
@@ -211,6 +211,7 @@ jQuery(function($) {
 				$(this).clone().appendTo('#'+root.elements.menuContainerID+' #active-filters');
 			});
 			$('#'+root.elements.containerID+' .'+root.elements.itemClass).each( function(){
+                root.control.selectedCat = '';
                 if(root.control.queryID == $(this).data('id') ){
                     if( $(this).data('category') != ''){
                         root.control.selectedCat = $(this).data('category');
@@ -267,7 +268,8 @@ jQuery(function($) {
 
             root.setColumnWidth();
 
-            $('#'+root.elements.containerID).isotope({
+            var container = $('#'+root.elements.containerID);
+            container.isotope({
 
                 itemSelector: '.'+root.elements.itemClass,
                 layoutMode: 'masonry',
@@ -289,15 +291,32 @@ jQuery(function($) {
                           byCategory: true, // name ascendingly
                           byTagWeight: false, // weight descendingly
                 },
-            })
+            });
+
+            container
+            //.isotope('updateSortData')
+            .isotope({ masonry: { columnWidth: root.elements.columnwidth } })
+                .isotope({ filter: filterClass })
+                .isotope({
+                    sortBy : [ 'byCategory', 'byTagWeight' ], //'byTagWeight', //
+                    sortAscending: {
+                          byCategory: true, // name ascendingly
+                          byTagWeight: false, // weight descendingly
+                    },
+                });
+            /*
+	        .isotope('reloadItems')
+            .isotope({ masonry: { columnWidth: root.elements.columnwidth } })
             .isotope({ filter: filterClass })
             .isotope({
-				sortBy : [ 'byCategory', 'byTagWeight' ], // 'byTagWeight', //
+				sortBy : 'byTagWeight', // [ 'byCategory', 'byTagWeight' ], // 'byTagWeight', //
 				sortAscending: {
-					  byCategory: true, // name ascendingly
+					  //byCategory: true, // name ascendingly
 					  byTagWeight: false, // weight descendingly
 				},
-			});
+			})
+            .isotope( 'layout' );
+
 			/* if more content loaded use:
             .isotope('updateSortData')
 	        .isotope('reloadItems')*/
@@ -321,7 +340,8 @@ jQuery(function($) {
             if( root.control.tagfilter.length > 0 ){
                 newhash += 'tags='+root.control.tagfilter.join();
             }
-            if(root.control.queryID != false && root.control.queryID != typeof undefined){
+            if(root.control.queryID != false && root.control.queryID != typeof undefined
+              && root.control.queryID != 'undefined'){
                 newhash += '&pid='+root.control.queryID;
             }
             /*if( root.control.catfilter.length > 0 ){
@@ -356,7 +376,8 @@ jQuery(function($) {
         this.doneResizing = function(){
 
 			root.setColumnWidth();
-			$('#'+root.elements.containerID).isotope({ masonry: { columnWidth: root.elements.columnwidth } }).isotope( 'layout' );
+
+            $('#'+root.elements.containerID).isotope({ masonry: { columnWidth: root.elements.columnwidth } }).isotope( 'layout' );
 
 		};
 
@@ -368,7 +389,6 @@ jQuery(function($) {
 			}else{
 			root.elements.columnwidth = w/2;
 			}
-
         };
 
         $('body').on( 'click', '#'+root.elements.menuContainerID+' #tag-filters .tagbutton', function(event){
@@ -410,7 +430,6 @@ jQuery(function($) {
 
                 //root.activateIsotope(); // reload isotope completely
                 container
-                //.isotope('updateSortData')
                 .isotope({ filter: filterClass })
                 .isotope({
                     sortBy : 'byTagWeight', //[ 'byCategory', 'byTagWeight' ],
@@ -419,6 +438,7 @@ jQuery(function($) {
                           byTagWeight: false, // weight descendingly
                     },
                 });
+
 
             }else{
 
@@ -433,7 +453,6 @@ jQuery(function($) {
                 });
             }
 
-            container.isotope({ masonry: { columnWidth: root.elements.columnwidth } }).isotope( 'layout' );
 
 
 	        $('html, body').animate({scrollTop:0}, 400);
@@ -500,8 +519,8 @@ jQuery(function($) {
 
             root.setColumnWidth();
 	  		var container = $('#'+root.elements.containerID);
-			container.prepend(selected);
 			container
+            .prepend(selected)
             .isotope('updateSortData')
             .isotope({ masonry: { columnWidth: root.elements.columnwidth } })
             .isotope({ filter: filterClass })
@@ -546,7 +565,25 @@ jQuery(function($) {
             colinrowS           : 3,
             columnwidth         : 0,
         }]);
+        /*
+        var detectScrollbar = function () {
+            if($(window).height() >= $(document).height()){
+                $('#statusNotifier1').fadeIn("slow");
+                $('#statusNotifier2').hide();
+            }
+            else
+            {
+                $('#statusNotifier1').hide();
+                $('#statusNotifier2').fadeIn("slow");
+            }
+        };
 
+        //call it initially
+        detectScrollbar();
+
+        //pass it to .resize() so it will be called when the event fires
+        $(window).resize(detectScrollbar);
+        */
 	});
 
 	$(window).load(function() {
