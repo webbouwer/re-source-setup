@@ -37,12 +37,6 @@ require_once('functions.php');
 
     <div id="pagecontainer" class="site">
 
-        <div id="itemcontainer" class="isotope">
-        </div>
-
-
-        <div id="postcontainer" class="isotope">
-        </div>
 
     </div>
 

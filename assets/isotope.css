@@ -1,10 +1,22 @@
 /** isotope item filter styles */
 
-#pagecontainer
+.shuffleContainer
 {
 position:relative;
 width:100%;
 min-height:100%;
+}
+.loadbox
+{
+position: fixed;
+left:50%;
+top:10%;
+width:160px;
+margin-left:-80px;
+text-align: center;
+background-color: black;
+color: white;
+padding:4px 0px;
 }
 
 .itemcontent {
@@ -17,12 +29,14 @@ min-height:100%;
 {
 display:none;
 }
-.item
+.shuffleItem
 {
 width:33.33%;
 background-color: blue;
 min-height: 200px;
 }
+
+
 /*
 .size-m {
   width: 33.33%;
@@ -37,12 +51,11 @@ min-height: 200px;
   min-height:180px;
 }*/
 
-.item.active {
+.shuffleItem.active {
 width:100%;
 min-height: 400px;
 background-color: red;
 }
-
 .itemcontent .intro
 {
 display:block;
@@ -58,34 +71,34 @@ height: auto;
 {
 display:none;
 }
-.item.active .itemcontent .main
+.shuffleItem.active .itemcontent .main
 {
 display:block;
 }
-.item.active .itemcontent .intro
+.shuffleItem.active .itemcontent .intro
 {
 width:auto;
 max-width:100%;
 max-height:100%;
 overflow-y: hidden;
 }
-.item.active .intro .excerpt
+.shuffleItem.active .intro .excerpt
 {
 display:none;
 }
-.item.active .itemcontent .intro img
+.shuffleItem.active .itemcontent .intro img
 {
 display:block;
 max-width:100%;
 width: 100%;
 heigth: auto;
 }
-.item iframe
+.shuffleItem iframe
 {
 max-width:100% !important;
 height:auto !important;
 }
-.item.active iframe
+.shuffleItem.active iframe
 {
 max-width:100% !important;
 height:auto !important;
@@ -94,11 +107,11 @@ min-height: 300px;
 
 
 @media screen and (max-width: 640px) {
-.item
+.shuffleItem
 {
 width:50%;
 }
-.item.active
+.shuffleItem.active
 {
 width:100%;
 }
@@ -121,7 +134,7 @@ width:100%;
   min-height:100%;
 }
 
-.item.active {
+.shuffleItem.active {
   width: 100%;
   min-height:240px;
 }
@@ -130,33 +143,31 @@ width:100%;
 
 /**** Isotope CSS3 transitions ****/
 
-.item
+.shuffleItem
 {
 transition: all 0.3s easeIn;
 }
 /*
-#pagecontainer,
-#pagecontainer .item {
+.isotope .shuffleItem {
    -webkit-transition: all 0.5s easeIn;
     -moz-transition: all 0.5s easeIn;
     -o-transition: all 0.5s easeIn;
     transition: all 0.5s easeIn;
 }
 
-#pagecontainer,
-#pagecontainer .item {
+.isotope .shuffleItem {
    -webkit-transition: all 0.5s easeIn;
     -moz-transition: all 0.5s easeIn;
     -o-transition: all 0.5s easeIn;
     transition: all 0.5s easeIn;
 }
-#pagecontainer .item{
+.isotope .shuffleItem{
   -webkit-transition-property: height, width;
      -moz-transition-property: height, width;
           transition-property: height, width;
 }
 
-#pagecontainer .item {
+.isotope .shuffleItem {
   -webkit-transition-property: -webkit-transform, opacity;
      -moz-transition-property:    -moz-transform, opacity;
           transition-property:         transform, opacity;

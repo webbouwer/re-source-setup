@@ -34,53 +34,25 @@ a.active
 color: #232323;
 }
 
+
+/* tag area */
+#itemcontainer
+{
+
+}
+.shuffleItem
+{
+
+}
+#tagmenucontainer
+{
+
+}
+#tagmenucontainer .tagbutton{
+
+}
 .loadbox
 {
-position: fixed;
-left:50%;
-top:10%;
-width:160px;
-margin-left:-80px;
-text-align: center;
-background-color: black;
-color: white;
-padding:4px 0px;
+
 }
 
-#mainmenucontainer
-{
-    position: relative;
-    display: block;
-    float:left;
-    width:25%;
-}
-#postcontainer
-{
-    position: relative;
-    display: block;
-    float:left;
-    width:50%;
-}
-#mainfiltercontainer
-{
-    position: relative;
-    float:right;
-    width:25%;
-}
-.item,
-.base,
-.size-s {
-  width: 14.29%;
-  min-height:150px;
-    color:#232323;
-  background: white;
-  overflow:hidden;
-}
-.item.active{
-  background: white;
-}
-
-.tag-filter.selected
-{
-font-weight:bold;
-}

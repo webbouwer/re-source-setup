@@ -1,3 +1,8 @@
+/**
+ * dataShuffle class
+ * Dependency: JQuery, Isotope, (ajax file / Wordpress)
+ * Masonry content-item grid ordered by tag weight (and categories)
+ */
 jQuery(function($) {
 
     // data models
@@ -17,6 +22,12 @@ jQuery(function($) {
         this.elements = {
             containerID     : 'itemcontainer',
             itemClass       : 'item',
+            menuContainerID : 'tagmenucontainer',
+            loadmsgboxClass : 'loadmsg',
+            parentContainer : 'body',
+            colinrowL       : 7,
+            colinrowM       : 5,
+            colinrowS       : 3,
             columnwidth     : 0,
         }
 
@@ -27,16 +38,19 @@ jQuery(function($) {
             prevcatfilter      : [],
         }
 
-        this.construct = function(ctrl,el){
+        this.construct = function( options ){
 
             // set settings
-            $.extend( this.control , ctrl);
-            $.extend( this.elements , el);
+            $.extend( root.control , options[0]);
+            $.extend( root.elements , options[1]);
+
+            console.log(options[1].itemClass);
 
             // base filter or hash tags
             var tagfilter = root.control.tagfilter;
             var catfilter = root.control.catfilter;
             var selectedCat = root.control.selectedCat;
+
             if(window.location.hash){
                     var hashvars = root.getHashUrlVars();
                     if( hashvars.tags  ){
@@ -51,9 +65,10 @@ jQuery(function($) {
                     if(catfilter.length > 0 ){
                         //root.control.catfilter = catfilter;
                     }
-                    if( hashvars.pid != '' && hashvars.pid != 'undefined'){
+                    if( hashvars.pid != '' && hashvars.pid != typeof undefined){
                         root.control.queryID = hashvars.pid;
                     }
+
             }//.. catfilter
             root.setNewHash( );
 
@@ -71,7 +86,7 @@ jQuery(function($) {
 
         this.toggleLoadBox = function(){
             if( $('.loadbox').length < 1 ){
-                $('body').append('<div class="loadbox">loading..</div>');
+                $('body').append('<div class="'+root.elements.loadmsgboxClass+' loadbox">loading..</div>');
             }else{
                 $('.loadbox').remove();
             }
@@ -101,7 +116,6 @@ jQuery(function($) {
                         });
                         root.markupHTML(result);
                     }
-                    root.toggleLoadBox();
                 }
             });
         };
@@ -125,7 +139,7 @@ jQuery(function($) {
                         objfilterclasses += ' base';
                     }*/
                     html += '<div id="post-'+obj.id+'" data-id="'+obj.id+'" ';
-                    html += 'class="'+root.elements.itemClass+' '+objfilterclasses+'" ';
+                    html += 'class="'+root.elements.itemClass+' shuffleItem '+objfilterclasses+'" ';
                     html += 'data-tags="'+obj.tags+'" data-cats="'+obj.cats+'" data-category="'+catreverse[0]+'">';
                     html += '<div class="itemcontent">';
 
@@ -147,10 +161,15 @@ jQuery(function($) {
                     oc++;
                 }
             });
+
+            if(  $('#'+root.elements.containerID).length < 1 ){
+                $('body').append('<div id="'+root.elements.containerID+'" class="shuffleContainer"></div>');
+            }
             $('#'+root.elements.containerID).append( html );
 
             root.activeFilterMenu( root.control.tagfilter );
             $('body').imagesLoaded( function(){
+                root.toggleLoadBox();
                 root.activateIsotope(); // reload isotope completely
             });
         };
@@ -159,32 +178,35 @@ jQuery(function($) {
 		this.buildTagListMenu = function(){
 
             var tags = root.filterdata.alltags;
+            if(  $('#'+root.elements.menuContainerID).length < 1 ){
+                $('body').append('<div id="'+root.elements.menuContainerID+'" class="shufflemenu"></div>');
+            }
 			var tagmenu = '<div id="tag-filters">';
 			for(i=0;i<tags.length;i++){
 				tagmenu += '<a href="#tags='+tags[i]['slug']+'" class="tagbutton '+tags[i]['slug']+'" data-tag="'+tags[i]['slug']+'">'+tags[i]['name']+'</a>';
 			}
 			tagmenu += '</div>';
-			$('body').prepend(tagmenu);
+			$('#'+root.elements.menuContainerID).prepend(tagmenu);
 		};
 
 		// active tag menu
 		this.activeFilterMenu = function( filter ){
 
-			if( $('#active-filters').length < 1 ){
-				$('body').prepend('<div id="active-filters"></div>');
+			if( $('#'+root.elements.menuContainerID+' #active-filters').length < 1 ){
+				$('#'+root.elements.menuContainerID).prepend('<div id="active-filters"></div>');
 			}
 
-			$('#tag-filters .tagbutton').each( function(){
+			$('#'+root.elements.menuContainerID+' #tag-filters .tagbutton').each( function(){
 				$(this).removeClass('selected');
 				if( $.inArray( $(this).data('tag') , filter ) > -1 ){
 					$(this).addClass('selected');
 				}
 			});
-			$('#active-filters').html('');
-			$('#tag-filters .tagbutton.selected').each( function(){
-				$(this).clone().appendTo('#active-filters');
+			$('#'+root.elements.menuContainerID+' #active-filters').html('');
+			$('#'+root.elements.menuContainerID+' #tag-filters .tagbutton.selected').each( function(){
+				$(this).clone().appendTo('#'+root.elements.menuContainerID+' #active-filters');
 			});
-			$('.item').each( function(){
+			$('#'+root.elements.containerID+' .'+root.elements.itemClass).each( function(){
                 if(root.control.queryID == $(this).data('id') ){
                     if( $(this).data('category') != ''){
                         root.control.selectedCat = $(this).data('category');
@@ -194,7 +216,7 @@ jQuery(function($) {
                 }
 				root.newTagWeight( this, filter );
 			});
-
+            console.log(JSON.stringify(filter));
 		};
 
         this.newTagWeight = function( obj, tagfilter ){
@@ -295,7 +317,7 @@ jQuery(function($) {
             if( root.control.tagfilter.length > 0 ){
                 newhash += 'tags='+root.control.tagfilter.join();
             }
-            if(root.control.queryID != false && root.control.queryID != 'undefined'){
+            if(root.control.queryID != false && root.control.queryID != typeof undefined){
                 newhash += '&pid='+root.control.queryID;
             }
             /*if( root.control.catfilter.length > 0 ){
@@ -345,7 +367,7 @@ jQuery(function($) {
 
         };
 
-        $('body').on( 'click', '#tag-filters .tagbutton', function(event){
+        $('body').on( 'click', '#'+root.elements.menuContainerID+' #tag-filters .tagbutton', function(event){
 
 			if (event.preventDefault) {
 				event.preventDefault();
@@ -357,7 +379,7 @@ jQuery(function($) {
 
 			var tag  = $this.attr('data-tag');
 
-            $('.item').removeClass('active');
+            $('.'+root.elements.itemClass).removeClass('active');
 
 			$this.toggleClass('selected');
 
@@ -366,7 +388,7 @@ jQuery(function($) {
             root.control.queryID = false;
 
 			root.control.tagfilter = [];
-			$('#tag-filters .tagbutton.selected').each( function( index ){
+			$('#'+root.elements.menuContainerID+' #tag-filters .tagbutton.selected').each( function( index ){
 				root.control.tagfilter[index] = $(this).data('tag');
 			});
 
@@ -416,17 +438,18 @@ jQuery(function($) {
 
 
 		// on active filter click (tag)
-		$('body').on( 'click', '#active-filters .tagbutton', function(event){
+		$('body').on( 'click', '#'+root.elements.menuContainerID+' #active-filters .tagbutton', function(event){
 			if (event.preventDefault) {
 				event.preventDefault();
 			} else {
 				event.returnValue = false;
 			}
-			$('#tag-filters .'+ $(this).data('tag') ).trigger('click');
+			$('#'+root.elements.menuContainerID+' #tag-filters .'+ $(this).data('tag') ).trigger('click');
 		});
 
         // on container click (item)
-		$('body').on('click', '.item', function(event){
+		$('body').on('click', '.shuffleItem', function(event){
+        //$('body').on( 'click', '#'+root.elements.containerID+' .'+root.elements.itemClass, function(event){
 
 			if (event.preventDefault) {
 				event.preventDefault();
@@ -438,7 +461,7 @@ jQuery(function($) {
 
             if( selected.hasClass('active') ){
 
-                $('.item').removeClass('active');
+                $('#'+root.elements.containerID+' .'+root.elements.itemClass).removeClass('active');
 
                 root.control.tagfilter = root.filterdata.prevtagfilter;
                 root.control.catfilter = root.filterdata.prevcatfilter;
@@ -450,7 +473,7 @@ jQuery(function($) {
                 root.filterdata.prevtagfilter = root.control.tagfilter;
                 root.filterdata.prevcatfilter = root.control.catfilter;
 
-                $('.item').removeClass('active');
+                $('#'+root.elements.containerID+' .'+root.elements.itemClass).removeClass('active');
                 selected.addClass('active');
 
                 root.control.queryID = selected.data('id');
@@ -490,7 +513,7 @@ jQuery(function($) {
 
   		});
 
-        this.construct(options);
+        this.construct( options );
 
     }
 
@@ -498,17 +521,27 @@ jQuery(function($) {
 
 	$(document).ready(function(){
 
-        // setup dataloader
-        var shuffle = new dataShuffle({
-            tagfilter     : [],
-            catfilter     : []
-        },{
-            containerID     : 'itemcontainer',
-            itemClass       : 'item',
-        });
-
-
-
+        // setup dataloader with options array ['control'={}, 'elements'={}]
+        var shuffle = new dataShuffle([
+        {
+            queryID             : false,
+            tagfilter           : ['smart'],
+            catfilter           : [],
+            selectedCat         : '',
+            loadedID            : [],
+            ppload              : 999,
+        },
+        {
+            containerID         : 'itemcontainer',
+            itemClass           : 'bla',
+            menuContainerID     : 'tagmenucontainer',
+            loadmsgboxClass     : 'loadmsg',
+            parentContainerID   : 'body',
+            colinrowL           : 7,
+            colinrowM           : 5,
+            colinrowS           : 3,
+            columnwidth         : 0,
+        }]);
 
 	});
 
