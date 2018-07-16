@@ -163,8 +163,10 @@ jQuery(function($) {
             });
 
             if(  $('#'+root.elements.containerID).length < 1 ){
-                $('body').append('<div id="'+root.elements.containerID+'" class="shuffleContainer"></div>');
+                $('body').append('<div id="'+root.elements.containerID+'"></div>');
             }
+            $('#'+root.elements.containerID).addClass('shuffleContainer');
+
             $('#'+root.elements.containerID).append( html );
 
             root.activeFilterMenu( root.control.tagfilter );
@@ -179,8 +181,10 @@ jQuery(function($) {
 
             var tags = root.filterdata.alltags;
             if(  $('#'+root.elements.menuContainerID).length < 1 ){
-                $('body').append('<div id="'+root.elements.menuContainerID+'" class="shufflemenu"></div>');
+                $('body').append('<div id="'+root.elements.menuContainerID+'"></div>');
             }
+            $('#'+root.elements.menuContainerID).addClass('shuffleMenu');
+
 			var tagmenu = '<div id="tag-filters">';
 			for(i=0;i<tags.length;i++){
 				tagmenu += '<a href="#tags='+tags[i]['slug']+'" class="tagbutton '+tags[i]['slug']+'" data-tag="'+tags[i]['slug']+'">'+tags[i]['name']+'</a>';
@@ -532,9 +536,9 @@ jQuery(function($) {
             ppload              : 999,
         },
         {
-            containerID         : 'itemcontainer',
-            itemClass           : 'bla',
-            menuContainerID     : 'tagmenucontainer',
+            containerID         : 'itemcontainer',// has '.shuffleContainer'
+            itemClass           : 'sourceitem', // has '.shuffleItem'
+            menuContainerID     : 'tagmenucontainer', // has '.shuffleMenu'
             loadmsgboxClass     : 'loadmsg',
             parentContainerID   : 'body',
             colinrowL           : 7,

@@ -36,8 +36,13 @@ require_once('functions.php');
 
 
     <div id="pagecontainer" class="site">
-
-
+         <div id="contentbar">
+             content titles
+        </div>
+         <div id="tagmenucontainer">
+        </div>
+        <div id="itemcontainer">
+        </div>
     </div>
 
 	<?php wp_footer(); ?>

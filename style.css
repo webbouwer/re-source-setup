@@ -36,19 +36,27 @@ color: #232323;
 
 
 /* tag area */
-#itemcontainer
+#contentbar
 {
-
+width:20%;
+float:left;
+}
+#itemcontainer,
+.shuffleContainer
+{
+min-width:480px;
+width:auto;
+}
+.shuffleMenu
+{
+width:20%;
+float:right;
 }
 .shuffleItem
 {
 
 }
-#tagmenucontainer
-{
-
-}
-#tagmenucontainer .tagbutton{
+.shuffleMenu .tagbutton{
 
 }
 .loadbox
