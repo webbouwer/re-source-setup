@@ -31,18 +31,43 @@ require_once('functions.php');
 <script src="<?php echo get_template_directory_uri(); ?>/assets/isotope.js" type="text/javascript" language="javascript"></script>
 <script src="<?php echo get_template_directory_uri(); ?>/assets/imagesloaded.js" type="text/javascript" language="javascript"></script>
 <link rel="stylesheet" id="wp-startup-theme-style"  href="<?php echo get_template_directory_uri(); ?>/assets/isotope.css" type="text/css" media="all" />
+
 </head>
 <body <?php body_class(); ?>>
 
 
     <div id="pagecontainer" class="site">
-         <div id="contentbar">
-             content titles
+
+        <div id="mainframe">
+
+            <div id="leftcontainer">
+                 <div id="contentbar">
+                     content titles
+                </div>
+            </div>
+
+            <div id="infocontainer">
+                <div id="contentcontainer">
+                </div>
+            </div>
+
+            <div id="middlecontainer">
+                 <div id="contentbar">
+                </div>
+            </div>
+
+            <div id="rightcontainer">
+                <div id="tagmenucontainer">
+                </div>
+            </div>
+
+            <div id="postcontainer">
+                <div id="itemcontainer">
+                </div>
+            </div>
+
         </div>
-         <div id="tagmenucontainer">
-        </div>
-        <div id="itemcontainer">
-        </div>
+
     </div>
 
 	<?php wp_footer(); ?>

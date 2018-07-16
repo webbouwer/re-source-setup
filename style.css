@@ -16,8 +16,8 @@ Tags: theme-options, custom-menu, full-width-template, featured-image-header, fe
 /* Temp dev style */
 *
 {
-    margin:0;
-    padding:0;
+margin:0;
+padding:0;
 }
 body
 {
@@ -34,23 +34,48 @@ a.active
 color: #232323;
 }
 
+#pagecontainer,
+#mainframe
+{
+position: relative;
+width:100%;
+min-height:100%;
+}
 
 /* tag area */
-#contentbar
+#leftcontainer
 {
+position: relative;
 width:20%;
 float:left;
 }
-#itemcontainer,
-.shuffleContainer
+#infocontainer
 {
+position: relative;
 width:60%;
-    float:left;
+float:left;
 }
-.shuffleMenu
+#middlecontainer
 {
+position: relative;
+width:20%;
+float:left;
+}
+#postcontainer
+{
+position: relative;
+width:60%;
+float:right;
+}
+#rightcontainer
+{
+position: relative;
 width:20%;
 float:right;
+}
+
+.shuffleMenu
+{
 }
 .shuffleItem
 {
@@ -64,3 +89,36 @@ float:right;
 
 }
 
+@media screen and (max-width:640px) {
+/* tag area */
+#leftcontainer
+{
+position: relative;
+width:100%;
+float:left;
+}
+#infocontainer
+{
+position: relative;
+width:100%;
+float:left;
+}
+#middlecontainer
+{
+position: relative;
+width:100%;
+float:left;
+}
+#postcontainer
+{
+position: relative;
+width:100%;
+float:right;
+}
+#rightcontainer
+{
+position: relative;
+width:100%;
+float:right;
+}
+}

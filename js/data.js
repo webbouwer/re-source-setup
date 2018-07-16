@@ -382,9 +382,9 @@ jQuery(function($) {
 		};
 
 		this.setColumnWidth = function(){
-
+            var f = $(window).width();
 			var w = $('#'+root.elements.containerID).width();
-			if(w > 640) {
+			if(f > 640) {
 			root.elements.columnwidth = w/3;
 			}else{
 			root.elements.columnwidth = w/2;
@@ -482,6 +482,8 @@ jQuery(function($) {
 
     		var selected = $(this);
 
+	  		var container = $('#'+root.elements.containerID);
+
             if( selected.hasClass('active') ){
 
                 $('#'+root.elements.containerID+' .'+root.elements.itemClass).removeClass('active');
@@ -508,7 +510,7 @@ jQuery(function($) {
                 root.control.tagfilter = selected.attr('data-tags').split(',');
 
                 //root.control.catfilter = selected.attr('data-cats').split(',');
-
+                 container.prepend(selected);
             }
 
 			root.activeFilterMenu( root.control.tagfilter );
@@ -518,16 +520,15 @@ jQuery(function($) {
 			filterClass = root.getFilterClass();
 
             root.setColumnWidth();
-	  		var container = $('#'+root.elements.containerID);
+
 			container
-            .prepend(selected)
             .isotope('updateSortData')
             .isotope({ masonry: { columnWidth: root.elements.columnwidth } })
             .isotope({ filter: filterClass })
             .isotope({
-				sortBy : [ 'byCategory', 'byTagWeight' ], // 'byTagWeight', //
+				sortBy : 'byTagWeight', //[ 'byCategory', 'byTagWeight' ], //
 				sortAscending: {
-					  byCategory: true, // name ascendingly
+					  //byCategory: true, // name ascendingly
 					  byTagWeight: false, // weight descendingly
 				},
 			});
