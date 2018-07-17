@@ -16,6 +16,9 @@ Tags: theme-options, custom-menu, full-width-template, featured-image-header, fe
 /* Temp dev style */
 *
 {
+  -webkit-box-sizing: border-box;
+     -moz-box-sizing: border-box;
+          box-sizing: border-box;
 margin:0;
 padding:0;
 }
@@ -52,14 +55,13 @@ float:left;
 #infocontainer
 {
 position: relative;
-width:60%;
+width:0%;
 float:left;
 }
-#middlecontainer
-{
-position: relative;
-width:20%;
-float:left;
+#infocontainer #contentcontainer{
+    display: none;
+    min-width:320px;
+    float:left;
 }
 #postcontainer
 {
@@ -77,16 +79,38 @@ float:right;
 .shuffleMenu
 {
 }
-.shuffleItem
-{
 
-}
 .shuffleMenu .tagbutton{
 
 }
 .loadbox
 {
 
+}
+
+.state1 #leftcontainer {
+    width:20%;
+}
+.state1 #infocontainer {
+    width:60%;
+}
+.state1 #infocontainer #contentcontainer{
+    display: block;
+}
+.state1 #rightcontainer {
+    width:0%;
+}
+.state1 #postcontainer {
+    width:20%;
+}
+
+
+#leftcontainer,
+#infocontainer,
+#infocontainer #contentcontainer,
+#rightcontainer,
+#postcontainer {
+  transition: width linear .5s;
 }
 
 @media screen and (max-width:640px) {

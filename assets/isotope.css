@@ -36,8 +36,12 @@ min-height: 200px;
 }
 
 
-/*
-.size-m {
+.size-s {
+  width: 33.33%;
+  min-height:180px;
+}
+.size-m
+{
   width: 33.33%;
   min-height:180px;
 }
@@ -45,15 +49,20 @@ min-height: 200px;
   width: 66.66%;
   min-height:180px;
 }
-.size-l {
-  width: 100%;
-  min-height:180px;
-}*/
 
 .shuffleItem.active {
 width:100%;
 min-height: 400px;
 background-color: red;
+}
+
+.sidebar .size-s,
+.sidebar .size-m,
+.sidebar .size-l,
+.sidebar .shuffleItem.active,
+.sidebar .shuffleItem
+{
+width:100%;
 }
 .itemcontent .intro
 {
@@ -110,7 +119,8 @@ min-height: 300px;
 {
 width:50%;
 }
-.shuffleItem.active
+.shuffleItem.active,
+.sidebar .shuffleItem
 {
 width:100%;
 }

@@ -48,11 +48,9 @@ require_once('functions.php');
 
             <div id="infocontainer">
                 <div id="contentcontainer">
-                </div>
-            </div>
-
-            <div id="middlecontainer">
-                 <div id="contentbar">
+                    <div id="pagecontent">
+                        Text example for pages etc.
+                    </div>
                 </div>
             </div>
 

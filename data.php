@@ -95,7 +95,7 @@ class WPData{
                 'title' => get_the_title(),
                 'image' => get_the_post_thumbnail(),
                 'excerpt' => $excerpt,
-                'content' => apply_filters('the_content', get_the_content()),
+                'content' => $content,
                 'cats' => wp_get_post_terms( get_the_ID(), 'category', array("fields" => "slugs")),
                 'tags' => wp_get_post_terms( get_the_ID(), 'post_tag', array("fields" => "slugs")),
                 'date' => get_the_date(),

@@ -23,6 +23,8 @@ jQuery(function($) {
             containerID     : 'itemcontainer',
             itemClass       : 'item',
             menuContainerID : 'tagmenucontainer',
+            titleMenuID     : 'contentbar',
+            pageContainerID : 'pagecontent',
             loadmsgboxClass : 'loadmsg',
             parentContainer : 'body',
             colinrowL       : 7,
@@ -144,7 +146,7 @@ jQuery(function($) {
                     if(obj.image && obj.image != ''){
                     html += obj.image;
                     }
-                    html += '<h3>'+obj.title+'</h3>';
+                    html += '<div class="title"><h3>'+obj.title+'</h3></div>';
                     html += '<div class="excerpt">'+obj.excerpt+'</div>';
                     html += '</div>';
 
@@ -382,14 +384,64 @@ jQuery(function($) {
 		};
 
 		this.setColumnWidth = function(){
+
             var f = $(window).width();
+            var c = 1;
 			var w = $('#'+root.elements.containerID).width();
+            var n = w;
+
+            $('body').removeClass('screenS screenM');
+            // inrowL..
 			if(f > 640) {
-			root.elements.columnwidth = w/3;
+                c  = root.elements.colinrowM;
+                $('body').addClass('screenM');
 			}else{
-			root.elements.columnwidth = w/2;
+                c  = root.elements.colinrowS;
+                $('body').addClass('screenS');
 			}
+            n = w/c;
+            if( w < 420 && f > 640){
+                n = w;
+                $('#'+root.elements.containerID).addClass('sidebar');
+            }else{
+                $('#'+root.elements.containerID).removeClass('sidebar');
+            }
+
+            root.elements.columnwidth = n;
+
+            root.setSelectedContent($('#'+root.elements.containerID), $('#'+root.elements.titleMenuID), $('#'+root.elements.pageContainerID), '.'+root.elements.itemClass, 'div.matchweight');
+
+            console.log(n,c);
         };
+
+        this.setSelectedContent = function(parent, titlelist, contentbox, childSelector, keySelector) {
+            titlelist.html('');
+            contentbox.html('');
+            var items = parent.children(childSelector).sort(function(a, b) {
+                var vA = $(keySelector, a).text();
+                var vB = $(keySelector, b).text();
+                return (vA < vB) ? -1 : (vA > vB) ? 1 : 0;
+            });
+            if( $('#'+root.elements.containerID+' .active').length > 0 ){
+                $('#'+root.elements.containerID+' .active').find('.main').clone().prependTo( contentbox );
+                $('#'+root.elements.containerID+' .active').find('.title').clone().prependTo( contentbox );
+                $('#'+root.elements.containerID+' .active').find('img').first().clone().prependTo( contentbox );
+            }else{
+            }
+            $(items).each(function( idx, item ){
+                var title = $(item).find('.title').clone();
+                title.hide();
+                if( $(item).find(keySelector).text() == 0 ){
+                    title.css({ 'opacity': 0.6 });
+                }
+                title.prependTo(titlelist);
+                setTimeout(function(){
+                    title.fadeIn(200);
+                }, idx * 5);
+            });
+        }
+
+
 
         $('body').on( 'click', '#'+root.elements.menuContainerID+' #tag-filters .tagbutton', function(event){
 
@@ -510,7 +562,6 @@ jQuery(function($) {
                 root.control.tagfilter = selected.attr('data-tags').split(',');
 
                 //root.control.catfilter = selected.attr('data-cats').split(',');
-                 container.prepend(selected);
             }
 
 			root.activeFilterMenu( root.control.tagfilter );
@@ -521,18 +572,20 @@ jQuery(function($) {
 
             root.setColumnWidth();
 
+            if(root.control.queryID){
+                container.prepend(selected).isotope('layout');
+            }
 			container
             .isotope('updateSortData')
             .isotope({ masonry: { columnWidth: root.elements.columnwidth } })
             .isotope({ filter: filterClass })
             .isotope({
-				sortBy : 'byTagWeight', //[ 'byCategory', 'byTagWeight' ], //
+				sortBy : [ 'byCategory', 'byTagWeight' ], //'byTagWeight', //
 				sortAscending: {
-					  //byCategory: true, // name ascendingly
+					  byCategory: true, // name ascendingly
 					  byTagWeight: false, // weight descendingly
 				},
 			});
-
 	        $('html, body').animate({scrollTop:0}, 400);
 
   		});
@@ -557,34 +610,45 @@ jQuery(function($) {
         },
         {
             containerID         : 'itemcontainer',// has '.shuffleContainer'
-            itemClass           : 'sourceitem', // has '.shuffleItem'
+            itemClass           : 'item', // has '.shuffleItem'
             menuContainerID     : 'tagmenucontainer', // has '.shuffleMenu'
+            titleMenuID         : 'contentbar',
+            pageContainerID      : 'pagecontent',
             loadmsgboxClass     : 'loadmsg',
             parentContainerID   : 'body',
-            colinrowL           : 7,
-            colinrowM           : 5,
-            colinrowS           : 3,
+            colinrowL           : 4,
+            colinrowM           : 3,
+            colinrowS           : 2,
             columnwidth         : 0,
         }]);
+
+        // setup frameset swapps
+        $('body').on('click', '#leftcontainer', function(){
+            if( !$('body').hasClass('state1') ){
+                $('body').toggleClass('state1');
+                setTimeout(function(){
+                    shuffle.doneResizing();
+                },600);
+            }
+        });
+        $('body').on('click', '#itemcontainer', function(){
+            if( $('body').hasClass('state1') ){
+                $('body').toggleClass('state1');
+                setTimeout(function(){
+                    shuffle.doneResizing();
+                },600);
+            }
+        });
         /*
-        var detectScrollbar = function () {
-            if($(window).height() >= $(document).height()){
-                $('#statusNotifier1').fadeIn("slow");
-                $('#statusNotifier2').hide();
-            }
-            else
-            {
-                $('#statusNotifier1').hide();
-                $('#statusNotifier2').fadeIn("slow");
-            }
-        };
-
-        //call it initially
-        detectScrollbar();
-
-        //pass it to .resize() so it will be called when the event fires
-        $(window).resize(detectScrollbar);
-        */
+        $('#leftcontainer').toggle(
+        function() {
+            $('#activity').animate({width: '100%'});
+            $('#sidebar').animate({width: '0%'});
+        },
+        function() {
+            $('#activity').animate({width: '70%'});
+            $('#sidebar').animate({width: '30%'});
+        });*/
 	});
 
 	$(window).load(function() {
