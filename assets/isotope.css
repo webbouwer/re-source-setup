@@ -136,18 +136,11 @@ width:100%;
   width: 100%;
   min-height:180px;
 }
-    /*
-
 .itemcontent {
   min-width: 100%;
   min-height:100%;
 }
 
-.shuffleItem.active {
-  width: 100%;
-  min-height:240px;
-}
-*/
 }
 
 /**** Isotope CSS3 transitions ****/

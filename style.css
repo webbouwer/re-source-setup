@@ -36,7 +36,11 @@ a.active
 {
 color: #232323;
 }
-
+img
+{
+max-width:100%;
+height: auto;
+}
 #pagecontainer,
 #mainframe
 {
