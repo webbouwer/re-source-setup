@@ -393,9 +393,12 @@ jQuery(function($) {
 			var w = $('#'+root.elements.containerID).width();
             var n = w;
 
-            $('body').removeClass('screenS screenM');
+            $('body').removeClass('screenS screenM screenL');
             // inrowL..
-			if(f > 640) {
+			if( f > 900 ) {
+                c  = root.elements.colinrowL;
+                $('body').addClass('screenL');
+			}else if(f > 640) {
                 c  = root.elements.colinrowM;
                 $('body').addClass('screenM');
 			}else{
@@ -403,6 +406,7 @@ jQuery(function($) {
                 $('body').addClass('screenS');
 			}
             n = w/c;
+
             if( w < 420 && f > 640){
                 n = w;
                 $('#'+root.elements.containerID).addClass('sidebar');
