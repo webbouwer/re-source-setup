@@ -32,35 +32,57 @@ require_once('functions.php');
 <script src="<?php echo get_template_directory_uri(); ?>/assets/imagesloaded.js" type="text/javascript" language="javascript"></script>
 <link rel="stylesheet" id="wp-startup-theme-style"  href="<?php echo get_template_directory_uri(); ?>/assets/isotope.css" type="text/css" media="all" />
 
+<script src="<?php echo get_template_directory_uri(); ?>/js/view.js" type="text/javascript" language="javascript"></script>
 </head>
 <body <?php body_class(); ?>>
 
 
     <div id="pagecontainer" class="site">
 
-        <div id="mainframe">
+        <div id="topframe">
 
+                <div id="mainbuttonleft">
+                    <div class="left-titlebar">
+                        Artikelen
+                    </div>
+                </div>
+
+                <div id="mainmenucontainer">
+                    <div class="info-titlebar">
+                        Resource | search (Artikelen / Labels) + info menu
+                    </div>
+                </div>
+
+                <div id="mainbuttonright">
+                    <div class="right-titlebar">
+                        Labels
+                    </div>
+                </div>
+        </div>
+
+        <div id="mainframe">
             <div id="leftcontainer">
-                 <div id="contentbar">
+                <div id="contentbar" class="left-contentbar">
                      content titles
                 </div>
             </div>
 
             <div id="infocontainer">
+
                 <div id="contentcontainer">
-                    <div id="pagecontent">
+                    <div id="pagecontent" class="page-contentbar">
                         Text example for pages etc.
                     </div>
                 </div>
             </div>
 
             <div id="rightcontainer">
-                <div id="tagmenucontainer">
+                <div id="tagmenucontainer" class="right-contentbar">
                 </div>
             </div>
 
             <div id="postcontainer">
-                <div id="itemcontainer">
+                <div id="itemcontainer" class="info-contentbar">
                 </div>
             </div>
 

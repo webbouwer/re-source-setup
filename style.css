@@ -29,9 +29,11 @@ font-size:13px;
 color: black;
 background-color: white;
 }
+
 a{
 color: black;
 }
+
 a.active
 {
 color: #232323;
@@ -41,15 +43,255 @@ img
 max-width:100%;
 height: auto;
 }
+
+
+
+
+.shuffleMenu
+{
+}
+.shuffleMenu .tagbutton{
+}
+.loadbox
+{
+}
+
+
+
+
 #pagecontainer,
+#topframe,
 #mainframe
 {
 position: relative;
 width:100%;
 min-height:100%;
+clear:both;
 }
 
-/* tag area */
+
+
+
+
+/* top area's  */
+.left-titlebar
+{
+position: relative;
+width:20%;
+float:left;
+}
+.info-titlebar
+{
+position: relative;
+width:60%;
+float:left;
+}
+.right-titlebar
+{
+position: relative;
+width:14%;
+float:right;
+}
+
+
+#tagmenucontainer.right-contentbar
+{
+background-color: white;
+}
+
+
+
+#leftcontainer #contentbar.left-contentbar,
+#infocontainer #contentcontainer #pagecontent.page-contentbar,
+#rightcontainer #tagmenucontainer.right-contentbar,
+#postcontainer #itemcontainer.info-contentbar
+{
+}
+
+
+
+/* state0 */
+#leftcontainer{
+position: relative;
+width:12%;
+min-height:1px;
+float:left;
+}
+#leftcontainer #contentbar
+{
+display:none;
+}
+#infocontainer
+{
+position: relative;
+width:0%;
+float:left;
+}
+#infocontainer #contentcontainer
+{
+display: none;
+min-width:320px;
+float:left;
+}
+
+#postcontainer
+{
+position: relative;
+width:88%;
+float:right;
+}
+
+#tagmenucontainer.right-contentbar
+{
+position:fixed;
+top:inherit;
+right:0px;
+width:0%;
+min-height:100%;
+z-index:999;
+}
+
+
+
+
+
+
+
+/* state0,state1 .articlemenu */
+body.articlemenu #leftcontainer{
+width:20%;
+}
+body.articlemenu #leftcontainer #contentbar
+{
+display:block;
+}
+body.articlemenu #postcontainer
+{
+width:80%;
+}
+
+
+/* state0,state1 .labelmenu */
+body.labelmenu .right-titlebar
+{
+width:20%;
+}
+body.labelmenu #rightcontainer #tagmenucontainer.right-contentbar
+{
+width:20%;
+}
+
+
+
+/* state1 */
+body.articlemenu.state1 #infocontainer {
+    width:60%;
+}
+body.state1 #infocontainer {
+    width:68%;
+}
+body.state1 #infocontainer #contentcontainer{
+    display: block;
+}
+body.state1 #rightcontainer {
+    width:0%;
+}
+body.state1 #postcontainer {
+    width:20%;
+    float:right;
+}
+
+
+
+
+
+
+
+/*
+
+#infocontainer
+{
+position: relative;
+width:0%;
+float:left;
+}
+#infocontainer #contentcontainer
+{
+display: none;
+min-width:320px;
+float:left;
+}
+
+#postcontainer
+{
+position: relative;
+width:88%;
+float:right;
+}
+
+#tagmenucontainer.right-contentbar
+{
+position:fixed;
+top:inherit;
+right:0px;
+width:0%;
+min-height:100%;
+z-index:999;
+}
+
+body.labelmenu .right-titlebar
+{
+width:20%;
+}
+body.labelmenu #rightcontainer #tagmenucontainer.right-contentbar
+{
+width:20%;
+}
+
+
+
+.state1 #infocontainer {
+    width:60%;
+}
+body.state1 #infocontainer #contentcontainer{
+    display: block;
+}
+body.state1 #rightcontainer {
+    width:0%;
+
+}
+body.state1 #postcontainer {
+    width:20%;
+    float:right;
+}
+
+*/
+
+#leftcontainer,
+#infocontainer,
+#infocontainer #contentcontainer,
+#rightcontainer,
+#postcontainer,
+#contentbar,
+#tagmenucontainer,
+.right-titlebar,
+.info-titlebar,
+.left-titlebar
+{
+  transition: width linear .5s;
+}
+
+
+
+
+
+
+
+
+
+/* main area's  */
+
+/*
 #leftcontainer
 {
 position: relative;
@@ -62,34 +304,25 @@ position: relative;
 width:0%;
 float:left;
 }
-#infocontainer #contentcontainer{
-    display: none;
-    min-width:320px;
-    float:left;
+#infocontainer #contentcontainer
+{
+display: none;
+min-width:320px;
+float:left;
 }
+
 #postcontainer
 {
 position: relative;
 width:60%;
 float:right;
 }
+
 #rightcontainer
 {
 position: relative;
 width:20%;
 float:right;
-}
-
-.shuffleMenu
-{
-}
-
-.shuffleMenu .tagbutton{
-
-}
-.loadbox
-{
-
 }
 
 .state1 #leftcontainer {
@@ -107,18 +340,14 @@ float:right;
 .state1 #postcontainer {
     width:20%;
 }
+*/
 
-
-#leftcontainer,
-#infocontainer,
-#infocontainer #contentcontainer,
-#rightcontainer,
-#postcontainer {
-  transition: width linear .5s;
-}
 
 @media screen and (max-width:640px) {
-/* tag area */
+
+
+/* area's */
+/*
 #leftcontainer
 {
 position: relative;
@@ -149,4 +378,6 @@ position: relative;
 width:100%;
 float:right;
 }
+*/
+
 }

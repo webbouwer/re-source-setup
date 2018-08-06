@@ -98,7 +98,7 @@ jQuery(function($) {
             $.ajax({
                 url: filter_vars.filter_ajax_url,
                 data:{
-                    'action': 'multi_filter', // function to execute
+                    'action': 'multi_filter', // function to execute ( data.php - WPData() class )
                     'filter_nonce': filter_vars.filter_nonce, // wp_nonce
                     'filter_data': filter_data, // selected data filters
                 }, // form data
@@ -222,8 +222,10 @@ jQuery(function($) {
                 }
 				root.newTagWeight( this, filter );
 			});
+
             console.log(JSON.stringify(filter));
-		};
+
+        };
 
         this.newTagWeight = function( obj, tagfilter ){
 
@@ -412,8 +414,7 @@ jQuery(function($) {
 
             root.setSelectedContent($('#'+root.elements.containerID), $('#'+root.elements.titleMenuID), $('#'+root.elements.pageContainerID), '.'+root.elements.itemClass, 'div.matchweight');
 
-
-            console.log(n,c);
+            // console.log(n,c);
         };
 
         this.setSelectedContent = function(parent, titlelist, contentbox, childSelector, keySelector) {
@@ -637,22 +638,26 @@ jQuery(function($) {
 
 	$(document).ready(function(){
 
+	});
+
+	$(window).load(function() {
+
         // setup dataloader with options array ['control'={}, 'elements'={}]
         var shuffle = new dataShuffle([
         {
             queryID             : false,
-            tagfilter           : ['smart'],
+            tagfilter           : [], // ['smart', 'cheap'] start with tag array selection
             catfilter           : [],
             selectedCat         : '',
             loadedID            : [],
             ppload              : 999,
         },
         {
-            containerID         : 'itemcontainer',// has '.shuffleContainer'
-            itemClass           : 'item', // has '.shuffleItem'
-            menuContainerID     : 'tagmenucontainer', // has '.shuffleMenu'
+            containerID         : 'itemcontainer',// default class 'shuffleContainer'
+            itemClass           : 'item', // default class 'shuffleItem'
+            menuContainerID     : 'tagmenucontainer', // default class 'shuffleMenu'
             titleMenuID         : 'contentbar',
-            pageContainerID      : 'pagecontent',
+            pageContainerID     : 'pagecontent',
             loadmsgboxClass     : 'loadmsg',
             parentContainerID   : 'body',
             colinrowL           : 4,
@@ -661,24 +666,53 @@ jQuery(function($) {
             columnwidth         : 0,
         }]);
 
-        // setup frameset swapps
 
+        $('#mainbuttonleft').click(function(){
+
+                $('body').toggleClass('articlemenu');
+                setTimeout(function(){
+                        shuffle.doneResizing();
+                },600);
+
+        });
+        $('#mainbuttonright').click(function(){
+            if( $('body').hasClass('state1')  && !$('body').hasClass('labelmenu') ){
+                $('body').toggleClass('state1');
+            }
+            $('body').toggleClass('labelmenu');
+            setTimeout(function(){
+                    shuffle.doneResizing();
+            },600);
+        });
+
+        // setup frameset swapps
         $('body').on('click', '#leftcontainer', function(){
+
             if( !$('body').hasClass('state1') ){
+
                 $('body').toggleClass('state1');
                 setTimeout(function(){
                     shuffle.doneResizing();
                 },600);
+
             }
+
         });
+
         $('body').on('click', '#itemcontainer', function(){
+
             if( $('body').hasClass('state1') ){
+
                 $('body').toggleClass('state1');
                 setTimeout(function(){
                     shuffle.doneResizing();
                 },600);
+
             }
+
         });
+
+
         /*
         $('#leftcontainer').toggle(
         function() {
@@ -689,9 +723,7 @@ jQuery(function($) {
             $('#activity').animate({width: '70%'});
             $('#sidebar').animate({width: '30%'});
         });*/
-	});
 
-	$(window).load(function() {
     });
 
     $(document).ajaxStart(function() {
