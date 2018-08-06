@@ -669,20 +669,27 @@ jQuery(function($) {
 
         $('#mainbuttonleft').click(function(){
 
-                $('body').toggleClass('articlemenu');
-                setTimeout(function(){
-                        shuffle.doneResizing();
-                },600);
 
-        });
-        $('#mainbuttonright').click(function(){
-            if( $('body').hasClass('state1')  && !$('body').hasClass('labelmenu') ){
+            if( !$('body').hasClass('state1') && !$('body').hasClass('articlemenu') && shuffle.control.queryID != '' ){
+                $('body').toggleClass('state1');
+                if( $('body').hasClass('labelmenu') ){
+                    $('body').toggleClass('labelmenu');
+                }
+            }else if( $('body').hasClass('state1') && $('body').hasClass('articlemenu')  ){
                 $('body').toggleClass('state1');
             }
-            $('body').toggleClass('labelmenu');
+
+            $('body').toggleClass('articlemenu');
+
             setTimeout(function(){
                     shuffle.doneResizing();
             },600);
+
+        });
+        $('#mainbuttonright').click(function(){
+
+            $('body').toggleClass('labelmenu');
+
         });
 
         // setup frameset swapps
@@ -696,14 +703,18 @@ jQuery(function($) {
                 },600);
 
             }
+            if( $('body').hasClass('labelmenu') ){
+                $('body').toggleClass('labelmenu');
+            }
 
         });
 
-        $('body').on('click', '#itemcontainer', function(){
+        $('body').on('click', '#itemcontainer, #tagmenucontainer', function(){
 
             if( $('body').hasClass('state1') ){
 
                 $('body').toggleClass('state1');
+
                 setTimeout(function(){
                     shuffle.doneResizing();
                 },600);

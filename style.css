@@ -59,9 +59,7 @@ height: auto;
 
 
 
-#pagecontainer,
-#topframe,
-#mainframe
+#pagecontainer
 {
 position: relative;
 width:100%;
@@ -69,6 +67,29 @@ min-height:100%;
 clear:both;
 }
 
+#topframe
+{
+position: fixed;
+top:0px;
+left:0px;
+width:100%;
+min-height:40px;
+height:2%;
+padding:2% 0px;
+clear:both;
+background-color:white;
+z-index: 998;
+}
+
+
+#mainframe
+{
+position: relative;
+margin-top:4%;
+width:100%;
+min-height:96%;
+clear:both;
+}
 
 
 
@@ -140,7 +161,10 @@ position: relative;
 width:88%;
 float:right;
 }
-
+#postcontainer .info-contentbar
+{
+width:96%;
+}
 #tagmenucontainer.right-contentbar
 {
 position:fixed;
@@ -200,7 +224,10 @@ body.state1 #postcontainer {
     width:20%;
     float:right;
 }
-
+body.state1 #postcontainer .info-contentbar
+{
+width:98%;
+}
 
 
 
@@ -280,7 +307,6 @@ body.state1 #postcontainer {
 {
   transition: width linear .5s;
 }
-
 
 
 
