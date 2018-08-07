@@ -53,7 +53,7 @@ min-height: 200px;
 }
 
 .shuffleItem.active {
-width:75%;
+width:50%;
 min-height: 400px;
 background-color: red;
 }

@@ -10,6 +10,8 @@ License: GPL 3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 Text Domain: re_source
 Tags: theme-options, custom-menu, full-width-template, featured-image-header, featured-images
+GitHub Theme URI: https://github.com/webbouwer/re-source
+GitHub branch: development
 */
 
 
@@ -74,20 +76,20 @@ top:0px;
 left:0px;
 width:100%;
 min-height:40px;
-height:2%;
+height:4%;
 padding:2% 0px;
 clear:both;
 background-color:white;
-z-index: 998;
+z-index: 980;
 }
 
 
 #mainframe
 {
 position: relative;
-margin-top:4%;
+margin-top:6%;
 width:100%;
-min-height:96%;
+min-height:94%;
 clear:both;
 }
 
@@ -115,6 +117,16 @@ float:right;
 }
 
 
+#contentswitch
+{
+position:absolute;
+top:0px;
+right:-30px;
+width:60px;
+height:100%;
+z-index: 999;
+}
+
 #tagmenucontainer.right-contentbar
 {
 background-color: white;
@@ -140,7 +152,13 @@ float:left;
 }
 #leftcontainer #contentbar
 {
-display:none;
+/*display:none;*/
+position:fixed;
+top:inherit;
+left:-100%;
+min-height:100%;
+z-index:998;
+transition: left linear .5s;
 }
 #infocontainer
 {
@@ -148,6 +166,8 @@ position: relative;
 width:0%;
 float:left;
 }
+
+
 #infocontainer #contentcontainer
 {
 display: none;
@@ -161,6 +181,7 @@ position: relative;
 width:88%;
 float:right;
 }
+
 #postcontainer .info-contentbar
 {
 width:96%;
@@ -172,7 +193,7 @@ top:inherit;
 right:0px;
 width:0%;
 min-height:100%;
-z-index:999;
+z-index:990;
 }
 
 
@@ -188,6 +209,8 @@ width:20%;
 body.articlemenu #leftcontainer #contentbar
 {
 display:block;
+width:inherit;
+left:0%;
 }
 body.articlemenu #postcontainer
 {

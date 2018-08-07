@@ -673,7 +673,7 @@ jQuery(function($) {
 
         $('#mainbuttonleft').click(function(){
 
-
+            /* for content switch
             if( !$('body').hasClass('state1') && !$('body').hasClass('articlemenu') && shuffle.control.queryID != '' ){
                 $('body').toggleClass('state1');
                 if( $('body').hasClass('labelmenu') ){
@@ -681,7 +681,7 @@ jQuery(function($) {
                 }
             }else if( $('body').hasClass('state1') && $('body').hasClass('articlemenu')  ){
                 $('body').toggleClass('state1');
-            }
+            } */
 
             $('body').toggleClass('articlemenu');
 
@@ -699,32 +699,53 @@ jQuery(function($) {
         // setup frameset swapps
         $('body').on('click', '#leftcontainer', function(){
 
-            if( !$('body').hasClass('state1') ){
+            if( !$('body').hasClass('state1') && shuffle.control.queryID != ''){
 
+                //$('body').toggleClass('state1');
+
+                if( $('body').hasClass('labelmenu') ){
+                    $('body').toggleClass('labelmenu');
+                }
+
+            }
+            setTimeout(function(){
+                shuffle.doneResizing();
+            },600);
+        });
+
+        $('body').on('click', '#contentswitch', function(){
+
+
+            if( !$('body').hasClass('state1') && !$('body').hasClass('articlemenu') ){
+                $('body').toggleClass('articlemenu');
+            }
+            if( !$('body').hasClass('state1') && shuffle.control.queryID != '' ){
                 $('body').toggleClass('state1');
-                setTimeout(function(){
-                    shuffle.doneResizing();
-                },600);
-
+            }else if( $('body').hasClass('state1') ){
+                $('body').toggleClass('state1');
             }
-            if( $('body').hasClass('labelmenu') ){
-                $('body').toggleClass('labelmenu');
-            }
+            setTimeout(function(){
+                shuffle.doneResizing();
+            },600);
 
         });
 
-        $('body').on('click', '#itemcontainer, #tagmenucontainer', function(){
+        $('body').on('click', '#tagmenucontainer', function(){
+
 
             if( $('body').hasClass('state1') ){
 
                 $('body').toggleClass('state1');
 
-                setTimeout(function(){
-                    shuffle.doneResizing();
-                },600);
 
             }
 
+
+            if( !$('body').hasClass('state1') ){
+                setTimeout(function(){
+                    shuffle.doneResizing();
+                },600);
+            }
         });
 
 
