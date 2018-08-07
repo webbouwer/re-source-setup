@@ -2,7 +2,7 @@
 Theme Name: re-source
 Theme URI: http://www.webdesigndenhaag.net/
 Description: WP Theme for project RE-source
-Version: 0.1
+Version: 0.1.2
 Details URI: http://webdesigndenhaag.net/
 Author: Webbouwer
 Author URI: https://github.com/webbouwer
@@ -89,6 +89,7 @@ z-index: 980;
 position: relative;
 margin-top:6%;
 width:100%;
+height:94%;
 min-height:94%;
 clear:both;
 }
@@ -123,7 +124,15 @@ position:absolute;
 top:0px;
 right:-30px;
 width:60px;
+min-height:800px;
 height:100%;
+max-height:100%;
+}
+#contentswitch .switchbutton
+{
+position:fixed;
+top:45%;
+background-color: green;
 z-index: 999;
 }
 
@@ -163,13 +172,16 @@ transition: left linear .5s;
 #infocontainer
 {
 position: relative;
+display: block;
 width:0%;
+height:100%;
 float:left;
 }
 
 
 #infocontainer #contentcontainer
 {
+position: relative;
 display: none;
 min-width:320px;
 float:left;
