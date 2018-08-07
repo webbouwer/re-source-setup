@@ -61,6 +61,7 @@ require_once('functions.php');
         </div>
 
         <div id="mainframe">
+
             <div id="leftcontainer">
                 <div id="contentbar" class="left-contentbar">
                      content titles
@@ -73,8 +74,15 @@ require_once('functions.php');
                     <div id="pagecontent" class="page-contentbar">
                         Text example for pages etc.
                     </div>
+
+                </div>
+
+
+                <div id="contentswitch">
+                    <div class="switchbutton">Swap</div>
                 </div>
             </div>
+
 
             <div id="rightcontainer">
                 <div id="tagmenucontainer" class="right-contentbar">
@@ -82,8 +90,11 @@ require_once('functions.php');
             </div>
 
             <div id="postcontainer">
+
+
                 <div id="itemcontainer" class="info-contentbar">
                 </div>
+
             </div>
 
         </div>
