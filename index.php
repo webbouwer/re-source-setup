@@ -39,62 +39,19 @@ require_once('functions.php');
 
     <div id="pagecontainer" class="site">
 
-        <div id="topframe">
-
-                <div id="mainbuttonleft">
-                    <div class="left-titlebar">
-                        Artikelen
-                    </div>
-                </div>
-
-                <div id="mainmenucontainer">
-                    <div class="info-titlebar">
-                        Resource | search (Artikelen / Labels) + info menu
-                    </div>
-                </div>
-
-                <div id="mainbuttonright">
-                    <div class="right-titlebar">
-                        Labels
-                    </div>
-                </div>
-        </div>
-
         <div id="mainframe">
 
-            <div id="leftcontainer">
-                <div id="contentbar" class="left-contentbar">
-                     content titles
-                </div>
+            <div id="infobar">
+            </div>
+
+            <div id="tagbar">
+
             </div>
 
             <div id="infocontainer">
-
-                <div id="contentcontainer">
-                    <div id="pagecontent" class="page-contentbar">
-                        Text example for pages etc.
-                    </div>
-
-                </div>
-
-
-                <div id="contentswitch">
-                    <div class="switchbutton">Swap</div>
-                </div>
             </div>
 
-
-            <div id="rightcontainer">
-                <div id="tagmenucontainer" class="right-contentbar">
-                </div>
-            </div>
-
-            <div id="postcontainer">
-
-
-                <div id="itemcontainer" class="info-contentbar">
-                </div>
-
+            <div id="itemcontainer">
             </div>
 
         </div>
