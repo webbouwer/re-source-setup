@@ -36,26 +36,14 @@ require_once('functions.php');
 </head>
 <body <?php body_class(); ?>>
 
-
-    <div id="pagecontainer" class="site">
-
-        <div id="mainframe">
-
-            <div id="infobar">
-            </div>
-
-            <div id="tagbar">
-
-            </div>
-
-            <div id="infocontainer">
-            </div>
-
-            <div id="itemcontainer">
-            </div>
-
+    <div id="maincontainer">
+        <div id="itemcontainer" class="shuffleContainer">
         </div>
+    </div>
 
+    <div id="rightcontainer">
+        <div id="filterbar" class="shuffleMenu">
+        </div>
     </div>
 
 	<?php wp_footer(); ?>

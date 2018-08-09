@@ -1,5 +1,105 @@
 /** isotope item filter styles */
 
+
+.shuffleContainer
+{
+position:relative;
+overflow:hidden;
+width:100%;
+max-width:1200px;
+min-height:100%;
+float:left;
+}
+.shuffleItem
+{
+width: 25%;
+min-height: 150px;
+transition: all 0.3s easeIn;
+}
+
+.shuffleItem .itemcontent,
+.shuffleItem .itemcontent .intro {
+min-width: 100%;
+min-width: 100%;
+min-height:100%;
+}
+
+.shuffleItem .itemcontent .intro img
+{
+display:block;
+width:100%;
+height: auto;
+}
+
+.shuffleItem iframe
+{
+max-width:100% !important;
+height:auto !important;
+}
+
+
+.shuffleItem.active iframe
+{
+max-width:100% !important;
+height:auto !important;
+min-height: 300px;
+}
+
+
+.size-s {
+  width: 25%;
+  min-height:180px;
+}
+.size-m
+{
+  width: 25%;
+  min-height:180px;
+}
+.size-l  {
+  width: 50%;
+  min-height:180px;
+}
+
+body.screenL .size-s {
+  width: 25%;
+  min-height:180px;
+}
+body.screenL .size-m
+{
+  width: 25%;
+  min-height:180px;
+}
+body.screenL .size-l  {
+  width: 50%;
+  min-height:180px;
+}
+
+
+
+body.screenM .size-s {
+  width: 33.33%;
+  min-height:180px;
+}
+body.screenM .size-m
+{
+  width: 33.33%;
+  min-height:180px;
+}
+body.screenM .size-l  {
+  width: 66.66%;
+  min-height:180px;
+}
+
+body.screenS .size-s,
+body.screenS .size-m,
+body.screenS .size-l  {
+  width: 50%;
+  min-height:180px;
+}
+
+.
+
+/*
 .shuffleContainer
 {
 position:relative;
@@ -19,9 +119,9 @@ padding:4px 0px;
 }
 
 .itemcontent {
-  /*min-width: 100%;
+  min-width: 100%;
   min-height:100%;
-  background: blue;*/
+  background: blue;
 }
 
 .hidden
@@ -79,14 +179,6 @@ display:block;
 width:100%;
 height: auto;
 }
-.itemcontent .main
-{
-display:none;
-}
-.shuffleItem.active .itemcontent .main
-{
-display:block;
-}
 .shuffleItem.active .itemcontent .intro
 {
 width:auto;
@@ -94,9 +186,24 @@ max-width:100%;
 max-height:100%;
 overflow-y: hidden;
 }
+
+.itemcontent .main
+{
+display:none;
+}
+
+.itemcontent .intro .excerpt
+{
+display:none;
+}
+
 .shuffleItem.active .intro .excerpt
 {
 display:none;
+}
+.shuffleItem.active .itemcontent .main
+{
+display:block;
 }
 .shuffleItem.active .itemcontent .intro img
 {
@@ -182,12 +289,15 @@ width:100%;
 
 }
 
-/**** Isotope CSS3 transitions ****/
-
 .shuffleItem
 {
 transition: all 0.3s easeIn;
 }
+*/
+
+
+
+
 /*
 .isotope .shuffleItem {
    -webkit-transition: all 0.5s easeIn;

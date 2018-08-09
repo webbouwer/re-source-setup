@@ -5,40 +5,39 @@
  */
 jQuery(function($) {
 
-    // data models
     var dataShuffle = function(options){
 
-        var root = this, resizecheck;
+        var root = this, resizecheck, isotopecheck;
 
         this.control = {
-            queryID         : false,
-            tagfilter       : [],
-            catfilter       : [],
-            selectedCat     : '',
-            loadedID        : [],
-            ppload          : 999
+            queryID             : false,
+            tagfilter           : [],
+            catfilter           : [],
+            selectedID          : false, // selected post ID
+            selectedCat         : false, // selected Category
+            loadedID            : [], // loaded content id's (to not load again)
+            loadedContent       : [], // loaded post data by id
+            ppload              : 99, // items load max per page/shuffle
         };
 
         this.elements = {
-            containerID     : 'itemcontainer',
-            itemClass       : 'item',
-            menuContainerID : 'tagbar',
-            titleMenuID     : 'infobar',
-            pageContainerID : 'infocontainer',
-            loadmsgboxClass : 'loadmsg',
-            parentContainer : 'body',
-            colinrowL       : 7,
-            colinrowM       : 5,
-            colinrowS       : 3,
-            columnwidth     : 0,
-        }
+            containerID         : 'itemcontainer',// '.shuffleContainer'
+            itemClass           : 'item', // '.shuffleItem'
+            filterMenuID        : 'filterbar', // '.shuffleMenu'
+            loadmsgboxClass     : 'loadmsg',
+            parentID            : 'maincontainer',// default parent
+            colinrowL           : 4,
+            colinrowM           : 3,
+            colinrowS           : 2,
+            columnwidth         : 0,
+        };
 
         this.filterdata = {
-            alltags         : filter_vars.filter_alltags,
-            allcats         : filter_vars.filter_allcats,
-            prevtagfilter    : [],
-            prevcatfilter      : [],
-        }
+            alltags             : filter_vars.filter_alltags,
+            allcats             : filter_vars.filter_allcats,
+            prevtagfilter       : [],
+            prevcatfilter       : [],
+        };
 
         this.construct = function( options ){
 
@@ -46,192 +45,122 @@ jQuery(function($) {
             $.extend( root.control , options[0]);
             $.extend( root.elements , options[1]);
 
-            // base filter or hash tags
-            var tagfilter = root.control.tagfilter;
-            var catfilter = root.control.catfilter;
-            var selectedCat = root.control.selectedCat;
 
-            if(window.location.hash){
-                    var hashvars = root.getHashUrlVars();
-                    if( hashvars.tags  ){
-                        tagfilter = hashvars.tags.split(',');
-                    }
-                    if( hashvars.cats  ){
-                        catfilter = hashvars.cats.split(',');
-                    }
-                    if(tagfilter.length > 0 ){
-                        root.control.tagfilter = tagfilter;
-                    }
-                    if(catfilter.length > 0 ){
-                        root.control.catfilter = catfilter;
-                    }
-                    if( hashvars.pid && hashvars.pid != '' && hashvars.pid != 'undefined' && hashvars.pid != typeof undefined){
-                        root.control.queryID = hashvars.pid;
-                    }
+            root.onEnable();
 
-            }//.. catfilter
-            root.setNewHash( );
+        };
 
+
+
+        this.onEnable = function(){
+
+            // filter
+            root.getHashVars();
             root.buildTagListMenu();
 
-            root.getDataByFilter();
+            // data
+            root.initData();
 
+            // window listeners
             $(window).resize(function() {
 				clearTimeout(root.resizecheck);
-				root.resizecheck = setTimeout( root.doneResizing, 20);
+				root.resizecheck = setTimeout( root.doneResize, 20);
             });
 
         };
 
-        this.toggleLoadBox = function(){
-            if( $('.loadbox').length < 1 ){
-                $('body').append('<div class="'+root.elements.loadmsgboxClass+' loadbox">loading..</div>');
-            }else{
-                $('.loadbox').remove();
+        this.doneResize = function(){
+
+			/*root.getColumnWidth( root.elements.infoContainerID );
+            $('#'+root.elements.infoContainerID).isotope({ masonry: { columnWidth: root.elements.columnwidth } }).isotope( 'layout' );
+            */
+
+            root.getColumnWidth( $('#'+root.elements.containerID) );
+            $('#'+root.elements.containerID).isotope({ masonry: { columnWidth: root.elements.columnwidth } }).isotope( 'layout' );
+
+		};
+
+
+
+        this.initData = function( container = false ){
+
+            if( !container ){
+                var container = $('#'+root.elements.containerID);
             }
-        };
 
-        this.getDataByFilter = function(){
+            root.loadData( function( result ){
 
-            var filter_data = [];
+                if( result[0] != 0 ){
 
-            $.ajax({
-                url: filter_vars.filter_ajax_url,
-                data:{
-                    'action': 'multi_filter', // function to execute ( data.php - WPData() class )
-                    'filter_nonce': filter_vars.filter_nonce, // wp_nonce
-                    'filter_data': filter_data, // selected data filters
-                }, // form data
-                dataType: 'json',
-                type: 'POST', // POST
-                beforeSend:function(xhr){
-                    root.toggleLoadBox();
-                },
-                success:function(result){
-                    // Display posts on page
-                    if( result[0] != 'No posts found' ){
-                        $.each( result, function(idx,obj){
-                            root.control.loadedID.push( obj.id );
-                        });
-                        root.markupHTML(result);
-                    }
+                    var html = '',
+                    c = 0;
+
+                    $.each( result, function(idx,obj){
+
+                        if( container.find('[data-id='+obj.id+']').length > 0 ){
+                            // object is on screen
+                        }else{
+                            container.append( root.markupItemHTML( obj , c ) );
+                        }
+                        c++;
+
+                    });
                 }
+
+                container.imagesLoaded( function(){
+
+                    root.orderContent( container );
+
+                });
+
             });
         };
 
-        this.markupHTML = function(result){
 
-            var html = '', oc = 0;
-            $.each( result, function(idx,obj){
-                if( $('[data-id='+obj.id+']').length > 0 ){
-                    // object is on screen
-                }else{
-                    var objfilterclasses = '';
-                    $(obj.tags).each(function( x , tag ){
-                        objfilterclasses += ' '+tag;
-                    });
-                    $(obj.cats).each(function( x , cats ){
-                        objfilterclasses += ' '+cats;
-                    });
-                    //var catreverse = obj.cats.reverse();
-                    var maincat = obj.cats;
-                    /*if(oc = 0){
-                        objfilterclasses += ' base';
-                    }*/
-                    html += '<div id="post-'+obj.id+'" data-id="'+obj.id+'" ';
-                    html += 'class="'+root.elements.itemClass+' shuffleItem '+objfilterclasses+'" ';
-                    html += 'data-tags="'+obj.tags+'" data-cats="'+obj.cats+'" data-category="'+maincat[0]+'">';
-                    html += '<div class="itemcontent">';
+        this.orderContent =  function( container ){
 
-                    html += '<div class="intro">';
-                    if(obj.image && obj.image != ''){
-                    html += obj.image;
-                    }
-                    html += '<div class="title"><h3>'+obj.title+'</h3></div>';
-                    html += '<div class="excerpt">'+obj.excerpt+'</div>';
-                    html += '</div>';
-
-                    html += '<div class="main">'+obj.content+'</div>';
-
-                    html += '</div>';
-                    html += '<div>'+obj.tags+'</div>';
-                    html += '<div>'+obj.cats+'</div>';
-                    html += '<div class="matchweight"></div>';
-                    html += '</div>';
-                    oc++;
-                }
-            });
-
-            if(  $('#'+root.elements.containerID).length < 1 ){
-                $('body').append('<div id="'+root.elements.containerID+'"></div>');
-            }
-            $('#'+root.elements.containerID).addClass('shuffleContainer');
-
-            $('#'+root.elements.containerID).append( html );
 
             root.activeFilterMenu( root.control.tagfilter );
 
-            $('#'+root.elements.containerID).imagesLoaded( function(){
+            root.getColumnWidth( container );
 
-                    root.toggleLoadBox();
-                    root.activateIsotope(); // reload isotope completely
-            });
+            var filterByClass = root.getFilterClass();
 
-            //root.setSelectedContent($('#'+root.elements.containerID), $('#'+root.elements.titleMenuID), $('#'+root.elements.pageContainerID), '.'+root.elements.itemClass, 'div.matchweight');
+            container.isotope({
+                itemSelector: '.'+root.elements.itemClass,
+                layoutMode: 'masonry',
+                //animationEngine: 'best-available',
+                transitionDuration: '0.6s',
+                masonry: {
+                    //columnWidth: root.elements.columnwidth,
+                    gutter: 0,
+                },
+                getSortData: {
+                    byCategory: function (elem) { // sort randomly
+                            return $(elem).data('category') === root.control.selectedCat ? 0 : 1;
+                    },
+                    byTagWeight: '.matchweight parseInt',
+                },
+                sortBy : [ 'byCategory', 'byTagWeight' ],//'byTagWeight', //
+                sortAscending: {
+                          byCategory: true, // name ascendingly
+                          byTagWeight: false, // weight descendingly
+                },
+            })
+            .isotope('reloadItems')
+            .isotope('updateSortData')
+            .isotope({ filter: filterByClass });
+            /*
+            .isotope({ masonry: { columnWidth: root.elements.columnwidth } })
+            .isotope( 'layout' );
+            */
+	        $('html, body').animate({scrollTop:0}, 400);
 
-        };
+        }
 
-        // add tag menu
-		this.buildTagListMenu = function(){
+        this.newTagWeight = function( obj ){
 
-            var tags = root.filterdata.alltags;
-            if(  $('#'+root.elements.menuContainerID).length < 1 ){
-                $('body').append('<div id="'+root.elements.menuContainerID+'"></div>');
-            }
-            $('#'+root.elements.menuContainerID).addClass('shuffleMenu');
-
-			var tagmenu = '<div id="tag-filters">';
-			for(i=0;i<tags.length;i++){
-				tagmenu += '<a href="#tags='+tags[i]['slug']+'" class="tagbutton '+tags[i]['slug']+'" data-tag="'+tags[i]['slug']+'">'+tags[i]['name']+'</a>';
-			}
-			tagmenu += '</div>';
-			$('#'+root.elements.menuContainerID).prepend(tagmenu);
-		};
-
-		// active tag menu
-		this.activeFilterMenu = function( filter ){
-
-			if( $('#'+root.elements.menuContainerID+' #active-filters').length < 1 ){
-				$('#'+root.elements.menuContainerID).prepend('<div id="active-filters"></div>');
-			}
-
-			$('#'+root.elements.menuContainerID+' #tag-filters .tagbutton').each( function(){
-				$(this).removeClass('selected');
-				if( $.inArray( $(this).data('tag') , filter ) > -1 ){
-					$(this).addClass('selected');
-				}
-			});
-			$('#'+root.elements.menuContainerID+' #active-filters').html('');
-			$('#'+root.elements.menuContainerID+' #tag-filters .tagbutton.selected').each( function(){
-				$(this).clone().appendTo('#'+root.elements.menuContainerID+' #active-filters');
-			});
-			$('#'+root.elements.containerID+' .'+root.elements.itemClass).each( function(){
-                root.control.selectedCat = '';
-                if(root.control.queryID == $(this).data('id') ){
-                    if( $(this).data('category') != ''){
-                        root.control.selectedCat = $(this).data('category');
-                    }
-                    $(this).addClass('active');
-                    //$(this).trigger('click');
-                }
-				root.newTagWeight( this, filter );
-			});
-
-            console.log(JSON.stringify(filter));
-
-        };
-
-        this.newTagWeight = function( obj, tagfilter ){
+            var tagfilter = root.control.tagfilter;
 
             var tags = $(obj).data('tags').split(',');
             var newSize = 'size-s';
@@ -244,143 +173,32 @@ jQuery(function($) {
                         mc++;
                     }
                 }
-
                 $(obj).find('.matchweight').text(mc);
 
                 var percent = 100 / tagfilter.length * mc;
-                if( percent > 80 ){
+                if( percent > 70 ){
                     newSize = 'size-l';
-                }else if( percent > 40 ){
+                }else if( percent > 30 ){
                     newSize = 'size-m';
                 }
-
             }else{
-
                 $(obj).find('.matchweight').text(0);
-
             }
             if( mc > 0 ){
                 $(obj).addClass(newSize);//.fadeIn();
             }else{
                 //$(obj).hide();
             }
-
-
-
         };
 
-        this.activateIsotope = function(){
-
-            // init isotope
-            var filterClass = root.getFilterClass();
-
-            root.setColumnWidth();
-
-            var container = $('#'+root.elements.containerID);
-            container.isotope({
-
-                itemSelector: '.'+root.elements.itemClass,
-                layoutMode: 'masonry',
-                animationEngine: 'best-available',
-                transitionDuration: '0.9s',
-                masonry: {
-                    //isFitWidth: true,
-                    columnWidth: root.elements.columnwidth,
-                    gutter: 0,
-                },
-                getSortData: {
-                    byCategory: function (elem) { // sort randomly
-                            return $(elem).data('category') === root.control.selectedCat ? 0 : 1;
-                    },
-                    byTagWeight: '.matchweight parseInt',
-                },
-                sortBy : [ 'byCategory', 'byTagWeight' ],
-                sortAscending: {
-                          byCategory: true, // name ascendingly
-                          byTagWeight: false, // weight descendingly
-                },
-            });
-
-            container //.isotope('updateSortData')
-            .isotope({ masonry: { columnWidth: root.elements.columnwidth } })
-                .isotope({ filter: filterClass })
-                .isotope({
-                    sortBy : [ 'byCategory', 'byTagWeight' ], //'byTagWeight', //
-                    sortAscending: {
-                          byCategory: true, // name ascendingly
-                          byTagWeight: false, // weight descendingly
-                    },
-                });
-
-        };
-
-        this.getHashUrlVars = function(){
-            var vars = [], hash;
-            var hashes = window.location.href.slice(window.location.href.indexOf('#') + 1).split('&');
-            for(var i = 0; i < hashes.length; i++)
-            {
-                hash = hashes[i].split('=');
-                vars.push(hash[0]);
-                vars[hash[0]] = hash[1];
-            }
-            return vars;
-        }
-
-        this.setNewHash = function( ){
-            var newhash = '#';
-            if( root.control.tagfilter.length > 0 ){
-                newhash += 'tags='+root.control.tagfilter.join();
-            }
-            if(root.control.queryID != false && root.control.queryID != typeof undefined
-              && root.control.queryID != 'undefined'){
-                newhash += '&pid='+root.control.queryID;
-            }
-            if( root.control.catfilter.length > 0 ){
-                if(root.control.tagfilter.length > 0){
-                    newhash += '&';
-                }
-                newhash += 'cats='+root.control.catfilter.join();
-            }
-            if(history.pushState) {
-                history.pushState(null, null, newhash );
-            }else{
-                location.hash = newhash;
-            }
-            //root.control.selectedCat = $this.attr('data-category');
-            //console.log( JSON.stringify(root.control.selectedCat));
-        };
-
-
-
-        this.getFilterClass = function(){
-            var filterbyclass = '*';
-
-			if( root.control.tagfilter.length > 0 ){
-				filterbyclass = '.'+root.control.tagfilter.join(',.');
-			}
-            if( root.control.catfilter.length > 0 ){
-				filterbyclass = '.'+root.control.catfilter.join(',.');
-			}
-            return filterbyclass;
-        };
-
-        this.doneResizing = function(){
-
-			root.setColumnWidth();
-
-            $('#'+root.elements.containerID).isotope({ masonry: { columnWidth: root.elements.columnwidth } }).isotope( 'layout' );
-
-		};
-
-		this.setColumnWidth = function(){
+        this.getColumnWidth = function( container ){
 
             var f = $(window).width();
             var c = 1;
-			var w = $('#'+root.elements.containerID).width();
+			var w = container.width();
             var n = w;
 
             $('body').removeClass('screenS screenM screenL');
-            // inrowL..
 			if( f > 900 ) {
                 c  = root.elements.colinrowL;
                 $('body').addClass('screenL');
@@ -395,17 +213,269 @@ jQuery(function($) {
 
             if( w < 420 && f > 640){
                 n = w;
-                $('#'+root.elements.containerID).addClass('sidebar');
+                container.addClass('column');
             }else{
-                $('#'+root.elements.containerID).removeClass('sidebar');
+                container.removeClass('column');
             }
 
             root.elements.columnwidth = n;
 
         };
 
+        this.markupItemHTML = function( obj, c = false ){
 
-        $('body').on( 'click', '#'+root.elements.menuContainerID+' #tag-filters .tagbutton', function(event){
+            var html = '';
+
+            root.control.loadedID.push( obj.id );
+            root.control.loadedContent[obj.id] = obj;
+
+            var objfilterclasses = '';
+            $(obj.tags).each(function( x , tag ){
+                objfilterclasses += ' '+tag;
+            });
+            $(obj.cats).each(function( x , cats ){
+                objfilterclasses += ' '+cats;
+            });
+            var maincat = obj.cats; // obj.cats.reverse();
+            if(c = 0){
+                objfilterclasses += ' base';
+            }
+
+            html += '<div id="post-'+obj.id+'" data-id="'+obj.id+'" class="'+root.elements.itemClass+' shuffleItem '+objfilterclasses+'" ';
+            html += 'data-author="'+obj.author+'" data-timestamp="'+obj.timestamp+'" ';
+            html += 'data-tags="'+obj.tags+'" data-cats="'+obj.cats+'" data-category="'+maincat[0]+'">';
+            html += '<div class="itemcontent">';
+            html += '<div class="intro">';
+            if(obj.image && obj.image != ''){
+                html += obj.image;
+            }
+            html += '<div class="title"><h3>'+obj.title+'</h3></div>';
+            html += '<div>'+obj.date+'</div>';
+            html += '<div class="excerpt"></div>'; // not loading content yet ('+obj.excerpt+')
+            html += '</div>';
+            html += '<div class="main"></div>'; // not loading content yet ('+obj.content+')
+            html += '</div>';
+            html += '<div>'+obj.cats+'</div>';
+            html += '<div>'+obj.tags+'</div>';
+            html += '<div class="matchweight"></div>';
+            html += '</div>';
+
+            //container.append( JSON.stringify(obj) );
+            return(html);
+        }
+
+        this.loadData = function( callback = false ){
+
+            var get_filter = root.getFilterData();
+
+            $.ajax({
+                url: filter_vars.filter_ajax_url,
+                data:{
+                    'action': 'multi_filter', // function to execute ( data.php - WPData() class )
+                    'filter_nonce': filter_vars.filter_nonce, // wp_nonce
+                    'filter_data': get_filter, // selected data filters
+                }, // form data
+                dataType: 'json',
+                type: 'POST', // POST
+                beforeSend:function(xhr){
+                    root.setLoadBox();
+                },
+                success:function(result){
+                    callback(result);
+                    root.removeLoadBox();
+                }
+            });
+
+        };
+
+
+        this.getFilterData = function(){
+
+            $.extend( root.filterdata , {
+                'queryID'       : root.control.queryID,
+                'tagfilter'     : root.control.tagfilter,
+                'catfilter'     : root.control.catfilter,
+                'selectedCat'   : root.control.selectedCat,
+                'loadedID'      : root.control.loadedID,
+                'ppload'        : root.control.ppload,
+            });
+            return root.filterdata;
+
+        };
+
+        this.getFilterClass = function(){
+
+            var filterbyclass = '*';
+
+			if( root.control.tagfilter.length > 0 ){
+				filterbyclass = '.'+root.control.tagfilter.join(',.');
+			}
+            if( root.control.catfilter.length > 0 ){
+				filterbyclass = '.'+root.control.catfilter.join(',.');
+			}
+            return filterbyclass;
+        };
+
+
+        this.setLoadBox = function(){
+            if( $('.loadbox').length < 1 ){
+                $('body').append('<div class="'+root.elements.loadmsgboxClass+' loadbox">loading..</div>');
+            }else{
+                $('.loadbox').remove();
+            }
+        };
+
+        this.removeLoadBox = function(){
+            if( $('.loadbox').length > 0 ){
+                $('.loadbox').remove();
+            }
+        };
+
+
+        this.getHashVars = function(){
+
+            var queryID = root.control.queryID;
+            var selectedCat = root.control.selectedCat;
+            var ppload = root.control.ppload;
+
+            var tagfilter = root.control.tagfilter;
+            var catfilter = root.control.catfilter;
+
+            if(window.location.hash){
+
+                    var hashvars = root.getHashUrlVars();
+                    if( hashvars.tags  ){
+                        tagfilter = hashvars.tags.split(',');
+                    }
+                    if( hashvars.cats  ){
+                        catfilter = hashvars.cats.split(',');
+                    }
+                    if(tagfilter.length > 0 ){
+                        root.control.tagfilter = tagfilter;
+                    }
+                    if(catfilter.length > 0 ){
+                        root.control.catfilter = catfilter;
+                    }
+                    if( hashvars.pid && hashvars.pid != '' && hashvars.pid != 'undefined' && hashvars.pid != typeof undefined){
+                        root.control.selectedID = hashvars.pid;
+                    }
+
+                    if( hashvars.category && hashvars.category != '' && hashvars.category != 'undefined' && hashvars.category != typeof undefined){
+                        root.control.selectedCat = hashvars.category;
+                    }
+                    if( hashvars.ppl && hashvars.ppl != '' && hashvars.ppp != 'undefined' && hashvars.ppl != typeof undefined){
+                        root.control.ppload = hashvars.ppl;
+                    }
+
+            }
+
+        };
+
+        this.getHashUrlVars = function(){
+            var vars = [], hash;
+            var hashes = window.location.href.slice(window.location.href.indexOf('#') + 1).split('&');
+            for(var i = 0; i < hashes.length; i++)
+            {
+                hash = hashes[i].split('=');
+                vars.push(hash[0]);
+                vars[hash[0]] = hash[1];
+            }
+            return vars;
+        };
+
+        this.setNewHash = function(){
+
+            var newhash = '#';
+            if( root.control.tagfilter.length > 0 ){
+                newhash += 'tags='+root.control.tagfilter.join();
+            }
+            if( root.control.catfilter.length > 0 ){
+                if(root.control.tagfilter.length > 0){
+                    newhash += '&';
+                }
+                newhash += 'cats='+root.control.catfilter.join();
+            }
+            if(root.control.selectedID != false && root.control.selectedID != typeof undefined
+              && root.control.selectedID != 'undefined'){
+                newhash += '&pid='+root.control.selectedID;
+            }
+            if(root.control.selectedCat != false && root.control.selectedCat != typeof undefined
+              && root.control.selectedCat != 'undefined'  && root.control.selectedCat != ''){
+                newhash += '&category='+root.control.selectedCat;
+            }
+            if(root.control.ppload != false && root.control.ppload != typeof undefined
+              && root.control.ppload != 'undefined'){
+                newhash += '&ppl='+root.control.ppload;
+            }
+
+            if(history.pushState) {
+                history.pushState(null, null, newhash );
+            }else{
+                location.hash = newhash;
+            }
+
+        };
+
+        // add tag menu
+		this.buildTagListMenu = function(){
+
+            var tags = root.filterdata.alltags;
+            if(  $('#'+root.elements.filterMenuID).length < 1 ){
+                $('body').append('<div id="'+root.elements.filterMenuID+'"></div>');
+            }
+            $('#'+root.elements.filterMenuID).addClass('shuffleMenu');
+
+			var tagmenu = '<div id="tag-filters">';
+			for(i=0;i<tags.length;i++){
+				tagmenu += '<a href="#tags='+tags[i]['slug']+'" class="tagbutton '+tags[i]['slug']+'" data-tag="'+tags[i]['slug']+'">'+tags[i]['name']+'</a>';
+			}
+			tagmenu += '</div>';
+			$('#'+root.elements.filterMenuID).prepend(tagmenu);
+		};
+
+		// active tag menu
+		this.activeFilterMenu = function( filter ){
+
+			if( $('#'+root.elements.filterMenuID+' #active-filters').length < 1 ){
+				$('#'+root.elements.filterMenuID).prepend('<div id="active-filters"></div>');
+			}
+
+			$('#'+root.elements.filterMenuID+' #tag-filters .tagbutton').each( function(){
+				$(this).removeClass('selected');
+				if( $.inArray( $(this).data('tag') , filter ) > -1 ){
+					$(this).addClass('selected');
+				}
+			});
+
+			$('#'+root.elements.filterMenuID+' #active-filters').html('');
+
+			$('#'+root.elements.filterMenuID+' #tag-filters .tagbutton.selected').each( function(){
+				$(this).clone().appendTo('#'+root.elements.filterMenuID+' #active-filters');
+			});
+
+            root.control.selectedCat = '';
+			$('#'+root.elements.containerID+' .'+root.elements.itemClass).each( function(){
+
+                $(this).removeClass('active');
+                root.control.selectedCat = '';
+
+                if(root.control.selectedID == $(this).data('id') ){
+                    if( $(this).data('category') != ''){
+                        root.control.selectedCat = $(this).data('category');
+                    }
+                    $(this).addClass('active').prependTo( $('#'+root.elements.containerID) );
+                    //$(this).trigger('click');
+                }
+				root.newTagWeight( this, filter );
+
+			});
+
+            console.log(JSON.stringify(filter));
+
+        };
+
+
+        $('body').on( 'click', '#'+root.elements.filterMenuID+' #tag-filters .tagbutton', function(event){
 
 			if (event.preventDefault) {
 				event.preventDefault();
@@ -415,80 +485,46 @@ jQuery(function($) {
 
     		var $this = $(this);
 
+            var container = $('#'+root.elements.containerID);
+
 			var tag  = $this.attr('data-tag');
 
             $('.'+root.elements.itemClass).removeClass('active');
 
 			$this.toggleClass('selected');
 
-            root.control.selectedCat = '';
-
             root.control.queryID = false;
+
+            root.control.selectedID = false;
+
+            root.control.selectedCat = '';
 
 			root.control.tagfilter = [];
 
 			root.control.catfilter = [];
 
-			$('#'+root.elements.menuContainerID+' #tag-filters .tagbutton.selected').each( function( index ){
+			$('#'+root.elements.filterMenuID+' #tag-filters .tagbutton.selected').each( function( index ){
 				root.control.tagfilter[index] = $(this).data('tag');
 			});
 
-			root.activeFilterMenu( root.control.tagfilter );
+            root.initData( container );
 
-			root.setNewHash();
+            root.setNewHash();
 
-			var filterClass = root.getFilterClass();
-
-            root.setColumnWidth();
-
-	  		var container = $('#'+root.elements.containerID);
-
-            if(filterClass == '*'){
-
-                //root.activateIsotope(); // reload isotope completely
-                container
-                .isotope({ filter: filterClass })
-                .isotope({
-                    sortBy : [ 'byCategory', 'byTagWeight' ],//'byTagWeight', //
-                    sortAscending: {
-                          byCategory: true, // name ascendingly
-                          byTagWeight: false, // weight descendingly
-                    },
-                });
-
-
-            }else{
-
-                container
-                .isotope({ filter: filterClass })
-                .isotope({
-                    sortBy : 'byTagWeight', //[ 'byCategory', 'byTagWeight' ],
-                    sortAscending: {
-                          //byCategory: true, // name ascendingly
-                          byTagWeight: false, // weight descendingly
-                    },
-                });
-            }
-
-
-
-	        $('html, body').animate({scrollTop:0}, 400);
 
   		});
 
+        // on active filter click (tag)
+        $('body').on( 'click', '#'+root.elements.filterMenuID+' #active-filters .tagbutton', function(event){
+            if (event.preventDefault) {
+                event.preventDefault();
+            } else {
+                event.returnValue = false;
+            }
+            $('#'+root.elements.filterMenuID+' #tag-filters .'+ $(this).data('tag') ).trigger('click');
+        })
 
-		// on active filter click (tag)
-		$('body').on( 'click', '#'+root.elements.menuContainerID+' #active-filters .tagbutton', function(event){
-			if (event.preventDefault) {
-				event.preventDefault();
-			} else {
-				event.returnValue = false;
-			}
-			$('#'+root.elements.menuContainerID+' #tag-filters .'+ $(this).data('tag') ).trigger('click');
-        });
-
-        // on container click (item)
-		$('body').on('click', '.shuffleItem', function(event){
+        $('body').on('click', '.shuffleItem', function(event){
         //$('body').on( 'click', '#'+root.elements.containerID+' .'+root.elements.itemClass, function(event){
 
 			if (event.preventDefault) {
@@ -499,7 +535,12 @@ jQuery(function($) {
 
     		var selected = $(this);
 
-	  		var container = $('#'+root.elements.containerID);
+	  		var container = selected.parent();
+
+            root.control.selectedID = false;
+
+            root.control.selectedCat = '';
+
 
             if( selected.hasClass('active') && !selected.parent().hasClass('sidebar') ){
 
@@ -507,54 +548,26 @@ jQuery(function($) {
 
                 root.control.tagfilter = root.filterdata.prevtagfilter;
                 root.control.catfilter = root.filterdata.prevcatfilter;
-                root.control.queryID = false;
-                root.control.selectedCat = false;
 
             }else{
 
                 root.filterdata.prevtagfilter = root.control.tagfilter;
                 root.filterdata.prevcatfilter = root.control.catfilter;
-
-                $('#'+root.elements.containerID+' .'+root.elements.itemClass).removeClass('active');
-                selected.addClass('active');
-
-                root.control.queryID = selected.data('id');
+                root.control.selectedID = selected.data('id');
 
                 if( selected.attr('data-category') && selected.attr('data-category') != ''){
                    root.control.selectedCat = selected.attr('data-category');
                 }
 
                 root.control.tagfilter = selected.attr('data-tags').split(',');
-                //root.control.catfilter = selected.attr('data-cats').split(',');
+                root.control.catfilter = selected.attr('data-cats').split(',');
+
             }
 
-			root.activeFilterMenu( root.control.tagfilter );
 
-			root.setNewHash();
+            root.initData( container );
 
-			filterClass = root.getFilterClass();
-
-            if ( event.originalEvent !== undefined ) {
-                root.setColumnWidth();
-            }
-
-            if(root.control.queryID){
-                container.prepend(selected).isotope('layout');
-            }
-			container
-            .isotope('updateSortData')
-            .isotope({ masonry: { columnWidth: root.elements.columnwidth } })
-            .isotope({ filter: filterClass })
-            .isotope({
-				sortBy : [ 'byCategory', 'byTagWeight' ], //'byTagWeight', //
-				sortAscending: {
-					  byCategory: true, // name ascendingly
-					  byTagWeight: false, // weight descendingly
-				},
-			});
-
-
-	        $('html, body').animate({scrollTop:0}, 400);
+            root.setNewHash();
 
         });
 
@@ -562,46 +575,34 @@ jQuery(function($) {
 
     }
 
+    $(document).ready(function(){
 
 
-	$(document).ready(function(){
-
-	});
-
-	$(window).load(function() {
-
-        // setup dataloader with options array ['control'={}, 'elements'={}]
         var shuffle = new dataShuffle([
-        {
-            queryID             : false,
-            tagfilter           : [], // ['smart', 'cheap'] start with tag array selection
-            catfilter           : [],
-            selectedCat         : '',
-            loadedID            : [],
-            ppload              : 999,
-        },
-        {
-            containerID         : 'itemcontainer',// default class 'shuffleContainer'
-            itemClass           : 'item', // default class 'shuffleItem'
-            menuContainerID     : 'tagbar', // default class 'shuffleMenu'
-            titleMenuID         : 'infobar',
-            pageContainerID     : 'infocontainer',
-            loadmsgboxClass     : 'loadmsg',
-            parentContainerID   : 'body',
-            colinrowL           : 4,
-            colinrowM           : 3,
-            colinrowS           : 2,
-            columnwidth         : 0,
+            {   // root.control
+                queryID             : false,
+                tagfilter           : [],
+                catfilter           : [],
+                ppload              : 25, // items load max per page/shuffle
+
+                // selectedID for selected filter
+                // setedCat for selected filter
+            },
+            {   // root.elements
+                containerID         : 'itemcontainer',// '.shuffleContainer'
+                itemClass           : 'item', // '.shuffleItem'
+                filterMenuID        : 'filterbar', // '.shuffleMenu'
+                loadmsgboxClass     : 'loadmsg',
+                parentID            : 'maincontainer',// default parent
+                colinrowL           : 4,
+                colinrowM           : 3,
+                colinrowS           : 2,
+                columnwidth         : 0,
         }]);
 
-    });
-
-    $(document).ajaxStart(function() {
-    });
-
-    $(document).ajaxComplete(function() { // http://api.jquery.com/ajaxstop/
-
-    });
+	});
+    $(window).load(function() {
+   });
 
 });
 
