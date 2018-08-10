@@ -33,6 +33,8 @@ class WPData{
             'filter_ajax_url' => admin_url( 'admin-ajax.php' ),
             'filter_alltags'  => get_terms( 'post_tag' ),
             'filter_allcats'  => get_terms( 'post_category' ),
+            'filter_data' => [],
+            // allposts?
             )
         );
 
@@ -45,6 +47,7 @@ class WPData{
         die('Permission denied');
 
         // verify request data
+        $this->queryID = $_REQUEST['filter_data']['queryID'];
         $this->tagfilter = $_REQUEST['filter_data']['tagfilter'];
         $this->catfilter = $_REQUEST['filter_data']['catfilter'];
         $this->loadedID = $_REQUEST['filter_data']['loadedID'];
@@ -63,6 +66,9 @@ class WPData{
             //'suppress_filters'  => false,
         );
 
+        if( !$this->queryID || $this->queryID == '') {
+            unset( $args['p'] );
+        }
         if( !$this->tagfilter || $this->tagfilter == '') {
             unset( $args['tag'] );
         }
@@ -86,8 +92,10 @@ class WPData{
 
             // post text
             $excerpt_length = 120; // words
-            $content = apply_filters('the_content', get_the_content());
-            $excerpt = truncate( get_the_excerpt(), $excerpt_length, '', false, true );
+            $post = get_post($post->id);
+            $fulltext = $post->post_content;//  str_replace( '<!--more-->', '',);
+            $content = apply_filters('the_content', $fulltext );
+            $excerpt = truncate( $content, $excerpt_length, '', false, true );  // get_the_excerpt()
 
             $response[] = array(
                 'id' => get_the_ID(),
@@ -99,6 +107,7 @@ class WPData{
                 'cats' => wp_get_post_terms( get_the_ID(), 'category', array("fields" => "slugs")),
                 'tags' => wp_get_post_terms( get_the_ID(), 'post_tag', array("fields" => "slugs")),
                 'date' => get_the_date(),
+                'timestamp' => strtotime(get_the_date()),
                 'author' => get_the_author(),
                 'custom_field_keys' => get_post_custom_keys()
             );

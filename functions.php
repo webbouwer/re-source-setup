@@ -108,6 +108,11 @@ function check_sidebar_params( $params ) {
 add_filter( 'dynamic_sidebar_params', 'check_sidebar_params' );
 
 
+
+
+
+
+
 /* Remove Emoji junk by Christine Cooper
  * Found on http://wordpress.stackexchange.com/questions/185577/disable-emojicons-introduced-with-wp-4-2
  */

@@ -46,21 +46,27 @@ max-width:100%;
 height: auto;
 }
 
-
-
-
-.shuffleMenu
-{
-}
-.shuffleMenu .tagbutton{
-}
 .loadbox
 {
+position: fixed;
+left:50%;
+top:10%;
+width:160px;
+margin-left:-80px;
+text-align: center;
+background-color: black;
+color: white;
+padding:4px 0px;
 }
 
 
 
 
+
+
+
+
+/* page elements */
 #pagecontainer
 {
 position: relative;
@@ -82,8 +88,6 @@ clear:both;
 background-color:white;
 z-index: 980;
 }
-
-
 #mainframe
 {
 position: relative;
@@ -92,8 +96,6 @@ width:100%;
 min-height:94%;
 clear:both;
 }
-
-
 
 
 /* top area's  */
@@ -131,7 +133,6 @@ z-index: 999;
 {
 background-color: white;
 }
-
 
 
 #leftcontainer #contentbar.left-contentbar,
@@ -196,10 +197,65 @@ min-height:100%;
 z-index:990;
 }
 
+#mainmenucontainer,
+.left-titlebar h4,
+.right-titlebar h4,
+#active-filters,
+#tag-filters,
+#contentbar .titlebox
+{
+font-size:15px;
+margin-left:40px;
+}
+
+#mainmenucontainer .info-titlebar
+{
+
+}
+.left-titlebar h4
+{
+text-transform: uppercase;
+font-size:21px;
+display:inline-block;
+padding-bottom:5px;
+border-bottom:3px solid black;
+margin-left:0px;
+padding-left:40px;
+}
+.right-titlebar h4
+{
+text-transform: uppercase;
+font-size:21px;
+padding-bottom:5px;
+border-bottom:3px solid black;
+}
+#active-filters
+{
+margin-bottom:24px;
+}
+#tag-filters
+{
+}
+#active-filters .tagbutton,
+#tag-filters .tagbutton
+{
+display: inline-block;
+padding:0px 5px 3px 0px;
+}
+#active-filters .tagbutton:before,
+#tag-filters .tagbutton:before
+{
+content:'#';
+}
+#active-filters .tagbutton
+{
+font-weight: bold;
+}
 
 
-
-
+#contentbar .titlebox
+{
+}
 
 
 /* state0,state1 .articlemenu */

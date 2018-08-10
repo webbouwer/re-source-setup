@@ -43,19 +43,19 @@ require_once('functions.php');
 
                 <div id="mainbuttonleft">
                     <div class="left-titlebar">
-                        Artikelen
+                        <h4>Artikelen</h4>
                     </div>
                 </div>
 
                 <div id="mainmenucontainer">
                     <div class="info-titlebar">
-                        Resource | search (Artikelen / Labels) + info menu
+                        Resource <input id="searchbox" class="basic-search" placeholder="in development" size="24" />
                     </div>
                 </div>
 
                 <div id="mainbuttonright">
                     <div class="right-titlebar">
-                        Labels
+                        <h4>Labels</h4>
                     </div>
                 </div>
         </div>

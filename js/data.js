@@ -15,6 +15,7 @@ jQuery(function($) {
             tagfilter       : [],
             catfilter       : [],
             selectedCat     : '',
+            topCat          : '',
             loadedID        : [],
             ppload          : 999
         };
@@ -139,7 +140,9 @@ jQuery(function($) {
                     }*/
                     html += '<div id="post-'+obj.id+'" data-id="'+obj.id+'" ';
                     html += 'class="'+root.elements.itemClass+' shuffleItem '+objfilterclasses+'" ';
-                    html += 'data-tags="'+obj.tags+'" data-cats="'+obj.cats+'" data-category="'+catreverse[0]+'">';
+                    html += 'data-author="'+obj.author+'" data-timestamp="'+obj.timestamp+'" ';
+                    html += 'data-tags="'+obj.tags+'" data-cats="'+obj.cats+'" data-category="'+catreverse[0]+'" data-matchweight="0">';
+
                     html += '<div class="itemcontent">';
 
                     html += '<div class="intro">';
@@ -147,15 +150,21 @@ jQuery(function($) {
                     html += obj.image;
                     }
                     html += '<div class="title"><h3>'+obj.title+'</h3></div>';
-                    html += '<div class="excerpt">'+obj.excerpt+'</div>';
-                    html += '</div>';
 
-                    html += '<div class="main">'+obj.content+'</div>';
+                    //html += '<div class="excerpt">'+obj.excerpt+'</div>';
 
-                    html += '</div>';
-                    html += '<div>'+obj.tags+'</div>';
                     html += '<div>'+obj.cats+'</div>';
+                    html += '<div>'+obj.tags+'</div>';
+
+                    html += '</div>';
+
+                    html += '<div class="main"><div class="textbox">'+obj.content+'</div></div>';
+
+                    html += '</div>';
+
+                    html += '<div class="button"><span>+</span></div>';
                     html += '<div class="matchweight"></div>';
+
                     html += '</div>';
                     oc++;
                 }
@@ -278,7 +287,7 @@ jQuery(function($) {
                 itemSelector: '.'+root.elements.itemClass,
                 layoutMode: 'masonry',
                 animationEngine: 'best-available',
-                transitionDuration: '0.9s',
+                transitionDuration: '0.6s',
                 masonry: {
                     //isFitWidth: true,
                     columnWidth: root.elements.columnwidth,
@@ -422,6 +431,7 @@ jQuery(function($) {
         };
 
         this.setSelectedContent = function(parent, titlelist, contentbox, childSelector, keySelector) {
+
             titlelist.html('');
             contentbox.html('');
             var items = parent.children(childSelector).sort(function(a, b) {
@@ -431,49 +441,57 @@ jQuery(function($) {
             });
 
             // selected content
+            contentbox.hide();
+
             if( $('#'+root.elements.containerID+' .active').length > 0 ){
                 // root.control.queryID? setPageContent ..
-                contentbox.hide();
                 var content = $('<div class="selected-post" data-id="'+$('#'+root.elements.containerID+' .active').data('id')+'" data-category="'+$('#'+root.elements.containerID+' .active').data('category')+'" data-tags="'+$('#'+root.elements.containerID+' .active').data('tags')+'"></div>');
                 $('#'+root.elements.containerID+' .active').find('img').first().clone().appendTo(content);
                 $('#'+root.elements.containerID+' .active').find('.title').clone().appendTo(content);
                 $('#'+root.elements.containerID+' .active').find('.main').clone().appendTo(content);
-                contentbox.append(content).imagesLoaded(function(){
-                        contentbox.fadeIn();
-                });
+
+            }else{
+                var content = $('<div>select an article - info or items lists</div>');
             }
+            contentbox.append(content).imagesLoaded(function(){
+                contentbox.fadeIn();
+            });
 
             // post title list menu
             $(items).each(function( idx, item ){
 
-                var titlebox = $('<div class="titlebox" data-id="'+$(item).data('id')+'" data-category="'+$(item).data('category')+'" data-tags="'+$(item).data('tags')+'"></div>');
+                if( $(item).hasClass( root.control.topCat ) || root.control.topCat == '' || root.control.topCat == false){
 
-                $(item).find('.title').clone().appendTo(titlebox);
+                    var titlebox = $('<div class="titlebox" data-id="'+$(item).data('id')+'" data-category="'+$(item).data('category')+'" data-tags="'+$(item).data('tags')+'"></div>');
 
-                titlebox.hide();
+                    $(item).find('.title').clone().appendTo(titlebox);
 
-                if( $(item).find(keySelector).text() == 0 ){
-                    titlebox.css({ 'opacity': 0.4 });
-                }
+                    titlebox.hide();
 
-                if( $(item).hasClass('active') ){
-                    titlebox.prependTo(titlelist).css({ 'text-decoration': 'underline'});
-                }else{
-                    titlebox.appendTo(titlelist);
-                }
-
-                titlebox.on( 'click', '.title', function(){
-
-                    if( !$( ".shuffleItem[data-id='"+$(this).parent().data('id')+"']" ).hasClass('active') ){
-                        $('#'+root.elements.pageContainerID).fadeOut();
-                        $( ".shuffleItem[data-id='"+$(this).parent().data('id')+"']" ).trigger('click');
+                    if( $(item).find(keySelector).text() == 0 ){
+                        titlebox.css({ 'opacity': 0.4 });
                     }
-                });
+
+                    if( $(item).hasClass('active') ){
+                        titlebox.prependTo(titlelist).css({ 'text-decoration': 'underline'});
+                    }else{
+                        titlebox.appendTo(titlelist);
+                    }
+
+                    titlebox.on( 'click', '.title', function(){
+
+                        if( !$( ".shuffleItem[data-id='"+$(this).parent().data('id')+"']" ).hasClass('active') ){
+                            $('#'+root.elements.pageContainerID).fadeOut();
+                            $( ".shuffleItem[data-id='"+$(this).parent().data('id')+"']" ).trigger('click');
+                        }
+                    });
 
 
-                setTimeout( function(){
-                    titlebox.fadeIn(50);
-                }, idx * 50);
+                    setTimeout( function(){
+                        titlebox.fadeIn(50);
+                    }, idx * 50);
+
+                }
 
             });
 
@@ -574,6 +592,9 @@ jQuery(function($) {
 
     		var selected = $(this);
 
+
+            if( selected.parent().hasClass('sidebar') || !selected.hasClass('active') ){
+
 	  		var container = $('#'+root.elements.containerID);
 
             if( selected.hasClass('active') && !selected.parent().hasClass('sidebar') ){
@@ -600,9 +621,18 @@ jQuery(function($) {
                 }
 
                 root.control.tagfilter = selected.attr('data-tags').split(',');
-
                 //root.control.catfilter = selected.attr('data-cats').split(',');
+
             }
+
+            /*if( selected.parent().hasClass('sidebar') ){
+                if( $('body').hasClass('state1') ){
+                    $('body').toggleClass('state1');
+                }
+                setTimeout(function(){
+                    root.doneResizing();
+                },600);
+            }*/
 
 			root.activeFilterMenu( root.control.tagfilter );
 
@@ -632,6 +662,7 @@ jQuery(function($) {
 
 	        $('html, body').animate({scrollTop:0}, 400);
 
+            }
   		});
 
         this.construct( options );
@@ -653,6 +684,7 @@ jQuery(function($) {
             tagfilter           : [], // ['smart', 'cheap'] start with tag array selection
             catfilter           : [],
             selectedCat         : '',
+            topCat              : 'examples-2',
             loadedID            : [],
             ppload              : 999,
         },
@@ -699,9 +731,9 @@ jQuery(function($) {
         // setup frameset swapps
         $('body').on('click', '#leftcontainer', function(){
 
-            if( !$('body').hasClass('state1') && shuffle.control.queryID != ''){
+            if( !$('body').hasClass('state1') ){ // && shuffle.control.queryID != ''
 
-                //$('body').toggleClass('state1');
+                $('body').toggleClass('state1');
 
                 if( $('body').hasClass('labelmenu') ){
                     $('body').toggleClass('labelmenu');
@@ -719,7 +751,7 @@ jQuery(function($) {
             if( !$('body').hasClass('state1') && !$('body').hasClass('articlemenu') ){
                 $('body').toggleClass('articlemenu');
             }
-            if( !$('body').hasClass('state1') && shuffle.control.queryID != '' ){
+            if( !$('body').hasClass('state1') ){ // && shuffle.control.queryID != ''
                 $('body').toggleClass('state1');
             }else if( $('body').hasClass('state1') ){
                 $('body').toggleClass('state1');
@@ -730,17 +762,16 @@ jQuery(function($) {
 
         });
 
+        $('body').on('click', '.shuffleItem .button', function( event ){
+            $(this).parent().find('.main .textbox').toggleClass('active');
+            $(this).parent().find('.main .textbox').slideToggle(300);
+        });
+
         $('body').on('click', '#tagmenucontainer', function(){
 
-
             if( $('body').hasClass('state1') ){
-
                 $('body').toggleClass('state1');
-
-
             }
-
-
             if( !$('body').hasClass('state1') ){
                 setTimeout(function(){
                     shuffle.doneResizing();
