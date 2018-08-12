@@ -96,6 +96,7 @@ padding-right:60px;
 .shuffleItem.active .itemcontent .main
 {
 position:absolute;
+display: block;
 top:0px;
 left:0px;
 width: auto;
@@ -151,6 +152,16 @@ height:auto !important;
 min-height: 300px;
 }
 
+.sidebar .shuffleItem.active .itemcontent
+{
+padding-right:0px;
+}
+.sidebar .shuffleItem.active > .button,
+.sidebar .shuffleItem.active .itemcontent .main
+{
+display: none;
+}
+
 .shuffleMenu
 {
 }
@@ -186,6 +197,7 @@ min-height: 200px;
 width:100%;
 min-height: 400px;
 }
+
 
 }
 

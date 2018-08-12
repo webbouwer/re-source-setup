@@ -684,7 +684,7 @@ jQuery(function($) {
             tagfilter           : [], // ['smart', 'cheap'] start with tag array selection
             catfilter           : [],
             selectedCat         : '',
-            topCat              : 'artikelen',
+            topCat              : 'examples-1',
             loadedID            : [],
             ppload              : 999,
         },

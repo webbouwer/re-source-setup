@@ -48,9 +48,20 @@ require_once('functions.php');
                 </div>
 
                 <div id="mainmenucontainer">
-                    <div class="info-titlebar">
-                        Resource <input id="searchbox" class="basic-search" placeholder="in development" size="24" />
+
+
+                    <div id="mainmenucontent">
+                        <div class="info-titlebar">
+                            Resource <input id="searchbox" class="basic-search" placeholder="in development" size="24" />
+                        </div>
+                        <div class="info-menubar">
+                            Team | Info
+                        </div>
+                        <div id="topinfocontent" class="info-contentbar">
+                            Content info
+                        </div>
                     </div>
+
                 </div>
 
                 <div id="mainbuttonright">
@@ -77,10 +88,6 @@ require_once('functions.php');
 
                 </div>
 
-
-                <div id="contentswitch">
-                    <div class="switchbutton">Swap</div>
-                </div>
             </div>
 
 
@@ -91,6 +98,9 @@ require_once('functions.php');
 
             <div id="postcontainer">
 
+                <div id="contentswitch">
+                    <div class="switchbutton">Swap</div>
+                </div>
 
                 <div id="itemcontainer" class="info-contentbar">
                 </div>
