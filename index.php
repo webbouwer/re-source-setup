@@ -25,13 +25,13 @@ require_once('functions.php');
     wp_head();
 
 ?>
-<link rel="stylesheet" id="wp-startup-theme-style"  href="<?php echo get_template_directory_uri(); ?>/style.css" type="text/css" media="all" />
 <!-- older IE versions: declare css3 queries and html5 tags through js -->
 <!--[if lt IE 9]><script src="<?php echo get_template_directory_uri(); ?>/assets/html5.js"></script><script src="<?php echo get_template_directory_uri(); ?>/assets/cssmediaqueries.js"></script><![endif]-->
 <script src="<?php echo get_template_directory_uri(); ?>/assets/isotope.js" type="text/javascript" language="javascript"></script>
 <script src="<?php echo get_template_directory_uri(); ?>/assets/imagesloaded.js" type="text/javascript" language="javascript"></script>
 <link rel="stylesheet" id="wp-startup-theme-style"  href="<?php echo get_template_directory_uri(); ?>/assets/isotope.css" type="text/css" media="all" />
 
+<link rel="stylesheet" id="wp-startup-theme-style"  href="<?php echo get_template_directory_uri(); ?>/style.css" type="text/css" media="all" />
 <script src="<?php echo get_template_directory_uri(); ?>/js/view.js" type="text/javascript" language="javascript"></script>
 </head>
 <body <?php body_class(); ?>>
@@ -48,9 +48,23 @@ require_once('functions.php');
                 </div>
 
                 <div id="mainmenucontainer">
-                    <div class="info-titlebar">
-                        Resource <input id="searchbox" class="basic-search" placeholder="in development" size="24" />
+
+
+                    <div id="mainmenucontent">
+                        <div id="mainmenutitlebox" class="info-titlebar">
+                            <div id="logobox">RE-source</div><div id="topbarsearch"><input id="searchbox" class="basic-search" placeholder="in development" size="24" /></div>
+                        </div>
+                        <div id="mainmenuinfobox" class="info-contentbar">
+                            <div id="topmenu">
+                            Team | Stromen | Info
+                            </div>
+                            <div id="topinfo">
+                            Info container
+                            </div>
+
+                         </div>
                     </div>
+
                 </div>
 
                 <div id="mainbuttonright">
@@ -59,7 +73,8 @@ require_once('functions.php');
                     </div>
                 </div>
         </div>
-
+        <div id="topplaceholder">
+        </div>
         <div id="mainframe">
 
             <div id="leftcontainer">
@@ -77,10 +92,6 @@ require_once('functions.php');
 
                 </div>
 
-
-                <div id="contentswitch">
-                    <div class="switchbutton">Swap</div>
-                </div>
             </div>
 
 
@@ -91,6 +102,9 @@ require_once('functions.php');
 
             <div id="postcontainer">
 
+                <div id="contentswitch">
+                    <div class="switchbutton">Swap</div>
+                </div>
 
                 <div id="itemcontainer" class="info-contentbar">
                 </div>
