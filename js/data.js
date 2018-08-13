@@ -692,7 +692,7 @@ jQuery(function($) {
             tagfilter           : [], // ['smart', 'cheap'] start with tag array selection
             catfilter           : [],
             selectedCat         : '',
-            topCat              : 'examples-1',
+            topCat              : 'artikelen',
             loadedID            : [],
             ppload              : 999,
         },
