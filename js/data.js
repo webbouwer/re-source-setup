@@ -153,8 +153,8 @@ jQuery(function($) {
 
                     //html += '<div class="excerpt">'+obj.excerpt+'</div>';
 
-                    html += '<div>'+obj.cats+'</div>';
-                    html += '<div>'+obj.tags+'</div>';
+                    html += '<div class="itemcatbox">'+obj.cats+'</div>';
+                    html += '<div class="itemtagbox">'+obj.tags+'</div>';
 
                     html += '</div>';
 
@@ -163,7 +163,7 @@ jQuery(function($) {
                     html += '</div>';
 
                     html += '<div class="button"><span>+</span></div>';
-                    html += '<div class="matchweight"></div>';
+                    html += '<div class="matchweight moderate"></div>';
 
                     html += '</div>';
                     oc++;
@@ -231,6 +231,12 @@ jQuery(function($) {
                 }
 				root.newTagWeight( this, filter );
 			});
+
+            $('#mainmenuinfobox').slideUp(100);
+            if( $('.shuffleItem .itemcontent .main .textbox').hasClass('active') ){
+                $('.shuffleItem .itemcontent .main .textbox').removeClass('active');
+                $('.shuffleItem .itemcontent .main .textbox').slideUp(100);
+            }
 
             console.log(JSON.stringify(filter));
 
@@ -465,6 +471,7 @@ jQuery(function($) {
                     var titlebox = $('<div class="titlebox" data-id="'+$(item).data('id')+'" data-category="'+$(item).data('category')+'" data-tags="'+$(item).data('tags')+'"></div>');
 
                     $(item).find('.title').clone().appendTo(titlebox);
+                    $('<div class="author">'+$(item).data('author')+'</div>').appendTo(titlebox);
 
                     titlebox.hide();
 
@@ -508,6 +515,7 @@ jQuery(function($) {
 			} else {
 				event.returnValue = false;
 			}
+
 
     		var $this = $(this);
 
@@ -703,8 +711,41 @@ jQuery(function($) {
         }]);
 
 
-        $('#mainbuttonleft').click(function(){
+        /*
+        $('body').on('click', '#mainframe,#mainbuttonleft,#mainbuttonright', function(event){
+            $('#mainmenuinfobox').slideUp();
+        });*/
 
+        $('body').on('click', '#logobox', function(event){
+            if (event.preventDefault) {
+				event.preventDefault();
+			} else {
+				event.returnValue = false;
+			}
+            $('#mainmenuinfobox').slideToggle();
+        });
+        /*
+        $('#logobox').toggle(
+        function(event) {
+			if (event.preventDefault) {
+				event.preventDefault();
+			} else {
+				event.returnValue = false;
+			}
+            $('#mainmenuinfobox').slideDown();
+        },
+        function(event) {
+            $('#mainmenuinfobox').slideUp();
+        });
+        */
+
+        $('#mainbuttonleft').click(function(event){
+
+			if (event.preventDefault) {
+				event.preventDefault();
+			} else {
+				event.returnValue = false;
+			}
             /* for content switch
             if( !$('body').hasClass('state1') && !$('body').hasClass('articlemenu') && shuffle.control.queryID != '' ){
                 $('body').toggleClass('state1');
@@ -729,8 +770,13 @@ jQuery(function($) {
         });
 
         // setup frameset swapps
-        $('body').on('click', '#leftcontainer', function(){
+        $('body').on('click', '#leftcontainer', function(event){
 
+			if (event.preventDefault) {
+				event.preventDefault();
+			} else {
+				event.returnValue = false;
+			}
             if( !$('body').hasClass('state1') ){ // && shuffle.control.queryID != ''
 
                 $('body').toggleClass('state1');
@@ -745,9 +791,14 @@ jQuery(function($) {
             },600);
         });
 
-        $('body').on('click', '#contentswitch', function(){
+        $('body').on('click', '#contentswitch', function(event){
 
 
+			if (event.preventDefault) {
+				event.preventDefault();
+			} else {
+				event.returnValue = false;
+			}
             if( !$('body').hasClass('state1') && !$('body').hasClass('articlemenu') ){
                 $('body').toggleClass('articlemenu');
             }
@@ -763,12 +814,23 @@ jQuery(function($) {
         });
 
         $('body').on('click', '.shuffleItem .button', function( event ){
+
+			if (event.preventDefault) {
+				event.preventDefault();
+			} else {
+				event.returnValue = false;
+			}
             $(this).parent().find('.main .textbox').toggleClass('active');
             $(this).parent().find('.main .textbox').slideToggle(300);
         });
 
-        $('body').on('click', '#tagmenucontainer', function(){
+        $('body').on('click', '#tagmenucontainer', function(event){
 
+			if (event.preventDefault) {
+				event.preventDefault();
+			} else {
+				event.returnValue = false;
+			}
             if( $('body').hasClass('state1') ){
                 $('body').toggleClass('state1');
             }

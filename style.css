@@ -2,7 +2,7 @@
 Theme Name: re-source
 Theme URI: http://www.webdesigndenhaag.net/
 Description: WP Theme for project RE-source
-Version: 0.1.2
+Version: 0.1.3
 Details URI: http://webdesigndenhaag.net/
 Author: Webbouwer
 Author URI: https://github.com/webbouwer
@@ -11,7 +11,7 @@ License URI: http://www.gnu.org/licenses/gpl-3.0.html
 Text Domain: re_source
 Tags: theme-options, custom-menu, full-width-template, featured-image-header, featured-images
 GitHub Theme URI: https://github.com/webbouwer/re-source
-GitHub branch: development
+GitHub branch: prototype1
 */
 
 
@@ -23,6 +23,7 @@ GitHub branch: development
           box-sizing: border-box;
 margin:0;
 padding:0;
+cursor:default;
 }
 body
 {
@@ -30,6 +31,15 @@ font-family: "Typewriter", helvetica, serif;
 font-size:13px;
 color: black;
 background-color: white;
+}
+
+.moderate
+{
+display: none;
+background-color: darkred;
+color: white;
+font-size: 18px;
+padding:1px 2px;
 }
 
 a{
@@ -82,19 +92,26 @@ position: fixed;
 top:0px;
 left:0px;
 width:100%;
-min-height:70px;
-height:8%;
-padding:0px 0px 2%;
+height:14%;
+min-height:140px;
 clear:both;
-background-color:white;
 z-index: 80;
+/*background-color:blue;*/
+}
+#topplaceholder
+{
+position:relative;
+display:block;
+width:100%;
+height:18%;
+min-height:140px;
 }
 #mainframe
 {
 position: relative;
-margin-top:8%;
+margin-top:0px; /* topplaceholder height */
 width:100%;
-min-height:92%;
+min-height:82%;
 clear:both;
 }
 
@@ -103,13 +120,15 @@ clear:both;
 .left-titlebar
 {
 position: relative;
-width:18%;
+width:20%;
 float:left;
 }
 #mainmenucontainer
 {
 position: relative;
-width:60%;
+margin-left:8%;
+width:44%;
+min-width:320px;
 float:left;
 }
 .right-titlebar
@@ -151,7 +170,7 @@ background-color: white;
 /* state0 */
 #leftcontainer{
 position: relative;
-width:12%;
+width:16%;
 min-height:1px;
 float:left;
 }
@@ -180,13 +199,19 @@ min-width:320px;
 float:left;
 }
 
+
+#pagecontent
+{
+position: relative;
+width:94%;
+}
+
 #postcontainer
 {
 position: relative;
-width:88%;
+width:85%;
 float:right;
 }
-
 #postcontainer .info-contentbar
 {
 width:96%;
@@ -201,8 +226,6 @@ min-height:100%;
 z-index:990;
 }
 
-.left-titlebar h4,
-.right-titlebar h4,
 #active-filters,
 #tag-filters,
 #contentbar .titlebox
@@ -215,36 +238,49 @@ margin-left:40px;
 /* mainmenu */
 #mainmenucontainer #mainmenucontent
 {
-padding:24px 3.5%;
+padding:20px 80px 24px;
+background-color: white;
 }
 #mainmenucontainer #mainmenucontent .info-titlebar,
-#mainmenucontainer #mainmenucontent .info-menubar,
 #mainmenucontainer #mainmenucontent .info-contentbar
 {
 position: relative;
 width:100%;
 }
-#mainmenucontainer #mainmenucontent .info-titlebar
+#mainmenucontainer #mainmenucontent #mainmenutitlebox.info-titlebar
 {
-padding-bottom: 20px;
-margin-bottom: 20px;
-border-bottom: 3px solid black;
+padding-top: 4px;
+padding-bottom: 6px;
+border-bottom: 5px solid black;
 }
-#mainmenucontainer #mainmenucontent .info-contentbar
+#mainmenucontainer #mainmenucontent #mainmenuinfobox.info-contentbar
 {
 display: none;
 }
 #logobox
 {
+width:56%;
+font-size:47px;
+font-weight:bold;
 display:inline-block;
 }
 #topbarsearch
 {
+width:44%;
 display:inline-block;
 }
 #topbarsearch #searchbox.basic-search
 {
-
+position: relative;
+display:block;
+font-size:18px;
+width:96%;
+padding:4px 4px;
+margin-top:10px;
+margin-bottom:-2px;
+border:2px solid grey;
+float:right;
+text-transform: uppercase;
 }
 
 
@@ -252,21 +288,45 @@ display:inline-block;
 .left-titlebar h4
 {
 text-transform: uppercase;
-font-size:21px;
+font-size:22px;
+font-weight: normal;
 display:inline-block;
-padding-top:38px;
-padding-bottom:5px;
-border-bottom:3px solid black;
+padding-top:40px;
+padding-bottom:20px;
+border-bottom:5px solid black;
 margin-left:0px;
 padding-left:40px;
+text-align: right;
+width:36%;
+min-width:180px;
+}
+body.articlemenu .left-titlebar h4
+{
+text-align: left;
+padding-left:0px;
+margin-left:40px;
+font-weight: bold;
+width:46%;
 }
 .right-titlebar h4
 {
 text-transform: uppercase;
-font-size:21px;
-padding-top:38px;
-padding-bottom:5px;
-border-bottom:3px solid black;
+font-size:22px;
+display:inline-block;
+font-weight: normal;
+padding-top:40px;
+padding-bottom:20px;
+border-bottom:5px solid black;
+width:36%;
+float:right;
+min-width:180px;
+}
+body.labelmenu .right-titlebar h4
+{
+width:76%;
+float:left;
+font-weight: bold;
+margin-left:40px;
 }
 #active-filters
 {
@@ -294,12 +354,22 @@ font-weight: bold;
 
 #contentbar .titlebox
 {
+margin-bottom:16px;
 }
-
+#contentbar .titlebox .title h3
+{
+font-size:20px;
+margin-bottom:4px;
+}
+#contentbar .titlebox .author
+{
+font-size:12px;
+font-weight:bold;
+}
 
 /* state0,state1 .articlemenu */
 body.articlemenu #leftcontainer{
-width:18%;
+width:20%;
 }
 body.articlemenu #leftcontainer #contentbar
 {
@@ -330,7 +400,7 @@ body.articlemenu.state1 #infocontainer {
     width:60%;
 }
 body.state1 #infocontainer {
-    width:68%;
+    width:64%;
 }
 body.state1 #infocontainer #contentcontainer{
     display: block;
@@ -351,67 +421,6 @@ width:98%;
 
 
 
-
-/*
-
-#infocontainer
-{
-position: relative;
-width:0%;
-float:left;
-}
-#infocontainer #contentcontainer
-{
-display: none;
-min-width:320px;
-float:left;
-}
-
-#postcontainer
-{
-position: relative;
-width:88%;
-float:right;
-}
-
-#tagmenucontainer.right-contentbar
-{
-position:fixed;
-top:inherit;
-right:0px;
-width:0%;
-min-height:100%;
-z-index:999;
-}
-
-body.labelmenu .right-titlebar
-{
-width:20%;
-}
-body.labelmenu #rightcontainer #tagmenucontainer.right-contentbar
-{
-width:20%;
-}
-
-
-
-.state1 #infocontainer {
-    width:60%;
-}
-body.state1 #infocontainer #contentcontainer{
-    display: block;
-}
-body.state1 #rightcontainer {
-    width:0%;
-
-}
-body.state1 #postcontainer {
-    width:20%;
-    float:right;
-}
-
-*/
-
 #leftcontainer,
 #infocontainer,
 #infocontainer #contentcontainer,
@@ -420,13 +429,28 @@ body.state1 #postcontainer {
 #contentbar,
 #tagmenucontainer,
 .right-titlebar,
+.right-titlebar h4
 .info-titlebar,
-.left-titlebar
+.left-titlebar,
+.left-titlebar h4
 {
   transition: width linear .5s;
 }
 
 
+.right-titlebar h4:hover,
+.left-titlebar h4:hover,
+#logobox:hover,
+.button,
+.button span,
+.tagbutton:hover,
+.titlebox,
+.titlebox *,
+#contentswitch .switchbutton:hover
+{
+cursor:hand;
+cursor:pointer;
+}
 
 
 
