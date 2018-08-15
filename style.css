@@ -147,7 +147,6 @@ margin-left:-40px;
 width:80px;
 height:180px;
 z-index: 999;
-background-color: blue;
 }
 #switchbutton
 {
@@ -157,25 +156,29 @@ display: block;
 .leftswapbutton,
 .rightswapbutton
 {
-
+font-size:22px;
+font-weight: bold;
+    background-color: white;
 }
 
 .leftswapbutton
 {
 display: block;
-width:180px;
-height: 30px;
-margin-left:-60px;
-margin-top:20px;
+width:210px;
+padding:5px;
+height: 50px;
+margin-left:-70px;
+margin-top:80px;
 transform: rotate(-90deg);
 }
 .rightswapbutton
 {
 display: block;
-width:180px;
+width:210px;
+padding:5px;
 height: 30px;
-margin-top:40px;
-margin-left:-40px;
+margin-top:-40px;
+margin-left:-50px;
 transform: rotate(90deg);
 }
 #tagmenucontainer.right-contentbar
@@ -223,6 +226,7 @@ float:left;
 display: none;
 min-width:320px;
 float:left;
+width:100%;
 }
 
 
@@ -230,8 +234,14 @@ float:left;
 {
 position: relative;
 width:94%;
+max-width:680px;
+margin: 0px auto;
 }
-
+#pagecontent img.wp-post-image
+{
+width:100%;
+height:auto;
+}
 #postcontainer
 {
 position: relative;

@@ -18,6 +18,7 @@ font-size:15px;
 position: relative;
 width: 25%;
 min-height: 180px;
+max-width:760px;
 }
 
 

@@ -557,6 +557,8 @@ jQuery(function($) {
 			var w = $('#'+root.elements.containerID).width();
             var n = w;
 
+            $('#'+root.elements.containerID+' .shuffleItem').removeClass('hidden');
+
             $('body').removeClass('screenS screenM screenL');
             // inrowL..
 			if( f > 900 ) {
@@ -574,6 +576,7 @@ jQuery(function($) {
             if( w < 420 && f > 640){
                 n = w;
                 $('#'+root.elements.containerID).addClass('sidebar');
+                $('#'+root.elements.containerID+' .active').addClass('hidden');
             }else{
                 $('#'+root.elements.containerID).removeClass('sidebar');
             }
