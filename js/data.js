@@ -75,6 +75,8 @@ jQuery(function($) {
 
             root.buildTagListMenu();
 
+            root.searchBoxAutomate();
+
             root.getDataByFilter();
 
             $(window).resize(function() {
@@ -120,6 +122,116 @@ jQuery(function($) {
             });
         };
 
+        this.searchBoxAutomate = function(){
+
+            var searchbar = $('#topbarsearch');
+            var searchbox = $('#topbarsearch input');
+            var pretext   = 'Input Search keyword';
+
+            var clickbox = $('<div class="searchAutoResult">'+pretext+'</div>');
+            clickbox.appendTo( searchbar );
+
+
+            searchbar.on( 'mouseover', function(event){
+
+                var searchstring = searchbox.attr('value');
+                if( searchstring.length < 1 ){
+                    searchstring = pretext;
+                }else{
+                    searchstring = root.getSearchRelavance( searchstring );
+                }
+                clickbox.html( searchstring );
+                if( !clickbox.hasClass( 'searching' ) ){
+                    clickbox.addClass( 'searching' );
+                }
+
+            });
+
+            clickbox.hover( function(){
+                $(this).addClass('searching');
+            },
+            function(){
+                $(this).removeClass('searching');
+            });
+
+            searchbox.on( 'keyup', function(event){
+
+                if (event.preventDefault) {
+                    event.preventDefault();
+                } else {
+                    event.returnValue = false;
+                }
+
+                var searchstring = searchbox.attr('value');
+                if( searchstring.length < 1 ){
+                    searchstring = pretext;
+                }else{
+                    searchstring = root.getSearchRelavance( searchstring );
+                }
+                clickbox.html( searchstring );
+
+                if( !clickbox.hasClass( 'searching' ) && searchbox.attr('value').length > 1 ){
+                    clickbox.addClass( 'searching' );
+                }
+            });
+
+            searchbox.on( 'blur', function(event){
+
+                if( clickbox.hasClass( 'searching' ) ){
+                    clickbox.removeClass( 'searching' );
+                }
+
+            });
+
+            searchbar.on( 'mouseout mouseleave', function(event){
+
+                if( clickbox.hasClass( 'searching' ) ){
+                    clickbox.removeClass( 'searching' );
+                }
+
+            });
+
+        };
+
+        this.getSearchRelavance = function( searchstring ){
+
+            var tagfilter = root.filterdata.alltags;
+            //var catfilter = root.filterdata.allCats;
+
+            var related = searchstring;
+            var unspaced = searchstring.split(' ');
+
+            var taglist = Array();
+
+            if( unspaced.length > 0 ){
+                related = '<ul>';
+                $.each( tagfilter, function( idx, tag ){
+                    var tagstring = tag.name;
+                    $.each( unspaced, function( inx, str ) {
+                        var r = tagstring.indexOf(str);
+                        if( r > -1  && str != ' ' && str != ''){
+                            //console.log( tag +' vs '+ str );
+                            if( $.inArray( tag.name , taglist ) < 0 ){ // no double
+
+                                taglist.push( tag.name );
+                                related += '<li><a href="#tags='+tag.slug+'" class="tagbutton ';
+                                if( $.inArray( tag.name , root.control.tagfilter ) > -1 ){
+                                    related += 'selected ';
+                                }
+                                related += ''+tag.slug+'" data-tag="'+tag.slug+'">'+tag.name+'</a></li>';
+
+                            }
+                        }
+
+                    });
+                });
+                related += '</ul>';
+            }
+
+            return related;
+
+        };
+
         this.markupHTML = function(result){
 
             var html = '', oc = 0;
@@ -127,6 +239,9 @@ jQuery(function($) {
                 if( $('[data-id='+obj.id+']').length > 0 ){
                     // object is on screen
                 }else{
+                    var display_tags = root.gethtmlListTags( obj.tags );
+                    var display_cats = root.gethtmlListCats( obj.cats );
+
                     var objfilterclasses = '';
                     $(obj.tags).each(function( x , tag ){
                         objfilterclasses += ' '+tag;
@@ -135,9 +250,10 @@ jQuery(function($) {
                         objfilterclasses += ' '+cats;
                     });
                     var catreverse = obj.cats.reverse();
-                    /*if(oc = 0){
+                    if(oc = 0){
                         objfilterclasses += ' base';
-                    }*/
+                    }
+
                     html += '<div id="post-'+obj.id+'" data-id="'+obj.id+'" ';
                     html += 'class="'+root.elements.itemClass+' shuffleItem '+objfilterclasses+'" ';
                     html += 'data-author="'+obj.author+'" data-timestamp="'+obj.timestamp+'" ';
@@ -148,13 +264,16 @@ jQuery(function($) {
                     html += '<div class="intro">';
                     if(obj.image && obj.image != ''){
                     html += obj.image;
+                    }else{
+                        // check content media (youtube thumb?)
+                        html += '<div class="mediaplaceholder"><h3>'+obj.title+'</h3>Media placeholder</div>';
                     }
                     html += '<div class="title"><h3>'+obj.title+'</h3></div>';
 
                     //html += '<div class="excerpt">'+obj.excerpt+'</div>';
 
-                    html += '<div class="itemcatbox">'+obj.cats+'</div>';
-                    html += '<div class="itemtagbox">'+obj.tags+'</div>';
+                    html += '<div class="itemcatbox">'+display_cats+'</div>';
+                    html += '<div class="itemtagbox">'+display_tags+'</div>';
 
                     html += '</div>';
 
@@ -185,6 +304,36 @@ jQuery(function($) {
                     root.activateIsotope(); // reload isotope completely
             });
         };
+
+        // display clickable tags
+        this.gethtmlListTags = function( itemtags ){
+            var tags = root.filterdata.alltags;
+            //console.log(tags);
+            var html = '';
+            for(i=0;i<tags.length;i++){
+                for(t=0;t<itemtags.length;t++){
+                    if( tags[i]['name'] == itemtags[t] ){
+                        html += '<a href="#tags='+tags[i]['slug']+'" class="tagbutton '+tags[i]['slug']+'" data-tag="'+tags[i]['slug']+'">'+tags[i]['name']+'</a> ';
+                    }
+                }
+            }
+            return html;
+        }
+
+        this.gethtmlListCats = function( itemcats ){
+            var cats = root.filterdata.allcats;
+            //console.log(cats);
+            var html = '';
+            for(i=0;i<cats.length;i++){
+
+                for(t=0;t<itemcats.length;t++){
+                    if( cats[i]['slug'] == itemcats[t] ){
+                        html += '<a href="#cats='+cats[i]['slug']+'" class="catbutton '+cats[i]['slug']+'" data-cats="'+cats[i]['slug']+'">'+cats[i]['cat_name']+'</a> ';
+                    }
+                }
+            }
+            return html;
+        }
 
         // add tag menu
 		this.buildTagListMenu = function(){
@@ -293,7 +442,7 @@ jQuery(function($) {
                 itemSelector: '.'+root.elements.itemClass,
                 layoutMode: 'masonry',
                 animationEngine: 'best-available',
-                transitionDuration: '0.6s',
+                transitionDuration: '0.4s',
                 masonry: {
                     //isFitWidth: true,
                     columnWidth: root.elements.columnwidth,
@@ -579,7 +728,7 @@ jQuery(function($) {
 
 
 		// on active filter click (tag)
-		$('body').on( 'click', '#'+root.elements.menuContainerID+' #active-filters .tagbutton', function(event){
+		$('body').on( 'click', '#'+root.elements.menuContainerID+' #active-filters .tagbutton,  .searchAutoResult.searching .tagbutton', function(event){
 			if (event.preventDefault) {
 				event.preventDefault();
 			} else {
@@ -604,6 +753,8 @@ jQuery(function($) {
             if( selected.parent().hasClass('sidebar') || !selected.hasClass('active') ){
 
 	  		var container = $('#'+root.elements.containerID);
+
+
 
             if( selected.hasClass('active') && !selected.parent().hasClass('sidebar') ){
 
@@ -633,14 +784,6 @@ jQuery(function($) {
 
             }
 
-            /*if( selected.parent().hasClass('sidebar') ){
-                if( $('body').hasClass('state1') ){
-                    $('body').toggleClass('state1');
-                }
-                setTimeout(function(){
-                    root.doneResizing();
-                },600);
-            }*/
 
 			root.activeFilterMenu( root.control.tagfilter );
 

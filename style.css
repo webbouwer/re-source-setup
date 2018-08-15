@@ -35,7 +35,7 @@ background-color: white;
 
 .moderate
 {
-display: none;
+display: block;
 background-color: darkred;
 color: white;
 font-size: 18px;
@@ -142,15 +142,41 @@ float:right;
 #contentswitch
 {
 position:fixed;
-top:50%;
-margin-left:-30px;
+top:40%;
+margin-left:-40px;
+width:80px;
+height:180px;
 z-index: 999;
+background-color: blue;
 }
 #switchbutton
 {
-width:60px;
+display: block;
+}
+
+.leftswapbutton,
+.rightswapbutton
+{
+
+}
+
+.leftswapbutton
+{
+display: block;
+width:180px;
+height: 30px;
 margin-left:-60px;
-height:20px;
+margin-top:20px;
+transform: rotate(-90deg);
+}
+.rightswapbutton
+{
+display: block;
+width:180px;
+height: 30px;
+margin-top:40px;
+margin-left:-40px;
+transform: rotate(90deg);
 }
 #tagmenucontainer.right-contentbar
 {
@@ -264,10 +290,15 @@ font-size:47px;
 font-weight:bold;
 display:inline-block;
 }
+
+
+/* search */
 #topbarsearch
 {
+position:relative;
 width:44%;
-display:inline-block;
+display:block;
+float:right;
 }
 #topbarsearch #searchbox.basic-search
 {
@@ -276,12 +307,60 @@ display:block;
 font-size:18px;
 width:96%;
 padding:4px 4px;
-margin-top:10px;
-margin-bottom:-2px;
-border:2px solid grey;
+margin:10px 0px -2px;
+border:1px solid grey;
 float:right;
-text-transform: uppercase;
+/*text-transform: uppercase;*/
+cursor:text;
 }
+
+#topbarsearch .searchAutoResult
+{
+display:none;
+width:96%;
+padding:4px 4px;
+border:1px solid grey;
+background-color:darkseagreen;
+transition: all linear .5s;
+}
+#topbarsearch .searchAutoResult.searching
+{
+position:absolute;
+left:4%;
+top:41px;
+display:block;
+min-height:40px;
+background-color:aqua;
+z-index: 990;
+}
+
+#topbarsearch .searchAutoResult.searching li
+{
+list-style: none;
+display: block;
+padding:5px 0px;
+}
+#topbarsearch .searchAutoResult.searching .tagbutton
+{
+position: relative;
+display: block;
+font-size:18px;
+cursor: hand;
+cursor: pointer;
+}
+
+#topbarsearch .searchAutoResult.searching .tagbutton:before
+{
+content: '#';
+}
+#topbarsearch .searchAutoResult.searching .tagbutton.selected
+{
+font-weight: bold;
+}
+
+
+
+
 
 
 /* buttons */
@@ -342,7 +421,8 @@ display: inline-block;
 padding:0px 5px 3px 0px;
 }
 #active-filters .tagbutton:before,
-#tag-filters .tagbutton:before
+#tag-filters .tagbutton:before,
+.shuffleItem .tagbutton:before
 {
 content:'#';
 }
@@ -444,9 +524,12 @@ width:98%;
 .button,
 .button span,
 .tagbutton:hover,
+.catbutton:hover,
 .titlebox,
 .titlebox *,
-#contentswitch .switchbutton:hover
+#contentswitch .switchbutton:hover,
+.leftswapbutton,
+.rightswapbutton
 {
 cursor:hand;
 cursor:pointer;

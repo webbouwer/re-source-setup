@@ -103,7 +103,7 @@ require_once('functions.php');
             <div id="postcontainer">
 
                 <div id="contentswitch">
-                    <div class="switchbutton">Swap</div>
+                    <div class="switchbutton"><span class="leftswapbutton">Theorie & Reflectie</span><span class="rightswapbutton">Praktijk en Design</span></div>
                 </div>
 
                 <div id="itemcontainer" class="info-contentbar">
