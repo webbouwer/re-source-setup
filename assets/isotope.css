@@ -18,6 +18,7 @@ font-size:15px;
 position: relative;
 width: 25%;
 min-height: 180px;
+max-width:760px;
 }
 
 
@@ -70,6 +71,7 @@ margin:0px 50px 30px 0px;
 display:block;
 width:100%;
 max-width:100%;
+min-height:80px;
 overflow-x: hidden;
 }
 
@@ -77,14 +79,26 @@ overflow-x: hidden;
 {
 display:none;
 }
-.shuffleItem .itemcontent .intro img
+.shuffleItem .itemcontent .intro img,
+.shuffleItem .itemcontent .intro .mediaplaceholder
 {
 display:block;
 width:100%;
 height: auto;
+min-height:140px;
 cursor:hand;
 cursor:pointer;
 }
+.shuffleItem .itemcontent .intro .mediaplaceholder
+{
+display: block;
+padding:40px 0px;
+line-height:40px;
+text-align:center;
+color: white;
+background-color: black;
+}
+
 .shuffleItem .button,
 .shuffleItem .itemcontent .intro .excerpt
 {
@@ -92,13 +106,12 @@ display: none;
 }
 .shuffleItem .itemcontent .itemcatbox
 {
-width:30%;
-margin:12px 0px;
+width:120px;
+margin:12px 10px 12px 0px;
 display:inline-block;
 }
 .shuffleItem .itemcontent .itemtagbox
 {
-width:70%;
 margin:12px 0px;
 display:inline-block;
 }
@@ -109,10 +122,13 @@ position: relative;
 margin-right:60px;
 }
 
-.shuffleItem.active .itemcontent .intro img
+
+.shuffleItem.active .itemcontent .intro img,
+.shuffleItem.active .itemcontent .intro .mediaplaceholder
 {
 cursor:default;
 }
+
 
 .shuffleItem.active .itemcontent .main
 {

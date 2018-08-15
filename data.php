@@ -26,13 +26,16 @@ class WPData{
         //$ajaxurl .= admin_url( 'admin-ajax.php?lang=' . ICL_LANGUAGE_CODE );
         // Enqueue script
         global $wp_query;
+
+        $cat_args = array("type"=>"post");
+
         wp_register_script('filter_script', get_template_directory_uri().'/js/data.js', false, null, false);
         wp_enqueue_script('filter_script');
         wp_localize_script( 'filter_script', 'filter_vars', array(
             'filter_nonce' => wp_create_nonce( 'filter_nonce' ), // Create nonce
             'filter_ajax_url' => admin_url( 'admin-ajax.php' ),
             'filter_alltags'  => get_terms( 'post_tag' ),
-            'filter_allcats'  => get_terms( 'post_category' ),
+            'filter_allcats'  => get_categories($cat_args),//get_terms( 'category' ), // get_categories(),//get_terms( 'post_category' )// ,
             'filter_data' => [],
             // allposts?
             )
