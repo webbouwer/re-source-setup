@@ -77,7 +77,10 @@ overflow-x: hidden;
 
 .shuffleItem .itemcontent .intro .title
 {
-display:none;
+position: absolute;
+top:23px;
+left:3px;
+margin-right: 3px;
 }
 .shuffleItem .itemcontent .intro img,
 .shuffleItem .itemcontent .intro .mediaplaceholder
