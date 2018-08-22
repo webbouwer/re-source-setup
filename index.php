@@ -30,14 +30,14 @@ require_once('functions.php');
 <script src="<?php echo get_template_directory_uri(); ?>/assets/isotope.js" type="text/javascript" language="javascript"></script>
 <script src="<?php echo get_template_directory_uri(); ?>/assets/imagesloaded.js" type="text/javascript" language="javascript"></script>
 <link rel="stylesheet" id="wp-startup-theme-style"  href="<?php echo get_template_directory_uri(); ?>/assets/isotope.css" type="text/css" media="all" />
-
 <link rel="stylesheet" id="wp-startup-theme-style"  href="<?php echo get_template_directory_uri(); ?>/style.css" type="text/css" media="all" />
 <script src="<?php echo get_template_directory_uri(); ?>/js/view.js" type="text/javascript" language="javascript"></script>
 </head>
 <body <?php body_class(); ?>>
 
-
     <div id="pagecontainer" class="site">
+
+    <?php if( is_front_page() ){ ?>
 
         <div id="topframe">
 
@@ -112,6 +112,43 @@ require_once('functions.php');
             </div>
 
         </div>
+    <?php }else{ // end frontpage
+
+        if ( have_posts() ) :
+            while( have_posts() ) : the_post();
+
+                $title_link = '<a href="'.get_the_permalink().'" target="_self" title="'.get_the_title().'">';
+                $image_link = '<a class="coverimage" href="'.get_the_permalink().'" target="_self" title="'.get_the_title().'">';
+                // begin html item
+                echo '<div id="post-'.get_the_ID().'"';
+                post_class();
+                echo '>';
+
+                // image
+                $featuredImage = wp_get_attachment_image_src( get_post_thumbnail_id($post->ID), 'medium' );
+                if($featuredImage){
+                    echo $image_link;
+                    echo '<img class="post-featured-image" src="'.$featuredImage[0].'" />';
+                    echo '</a>';
+                }
+                // title
+                echo '<div class="post-title">'. $title_link . get_the_title().'</a><div class="clr"></div></div>';
+                // content
+                echo '<div class="post-content">';
+                if( is_single() || is_page() ){
+                    echo apply_filters('the_content', get_the_content());
+                }else{
+                    echo the_excerpt_length( 12 );
+                }
+                echo '<div class="clr"></div></div>';
+
+                echo '<div class="clr"></div></div>'; // end  html item
+
+            endwhile;
+        endif;
+        ?>
+
+    <? } // end page/post content ?>
 
     </div>
 

@@ -1,8 +1,8 @@
 # re-source
 
 
-WP Theme for resource.info
+WP Theme for re-source.info
 
-tag filter example: https://webdesigndenhaag.net/lab/dev/orderbytags2
+Graphic Design by We-Are-Amp 2018
 
-Webbouwer Copyright 2018
+WP Theme Webbouwer Copyright 2018
